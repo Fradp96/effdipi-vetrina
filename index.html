@@ -8,50 +8,52 @@
 <meta name="robots" content="noindex, nofollow">
 <style>
   :root {
-    /* Rotazione della stanza: la scrive il JS seguendo il puntatore. */
+    /* Rotazione della scena: la scrive il JS seguendo il puntatore. */
     --rx: 0deg;
     --ry: 0deg;
     --pox: 0%;
     --poy: 0%;
     --luce: .5;
 
-    --sfondo: #080e1a;
-    --sfondo-lontano: #0d1a30;
-    --vetro: #16243c66;
-    --vetro-alto: #1e3155aa;
-    --bordo: #33507e;
-    --bordo-vivo: #6f9de4;
-    --griglia: #3f6fb552;
-    --griglia-viva: #5b93e6;
-    --pozza: #6ba0ee52;
-    --riflesso: #b9d4ff40;
-    --lume: #ffffff2b;
+    /* Palette del marchio: il nero, il blu del cerchio, il verde della
+       palma, il bianco. Tutto il resto sono sfumature di questi. */
+    --sfondo: #04070b;
+    --sfondo-lontano: #08243a;
+    --pannello-basso: #061c2c;
+    --pannello-alto: #1f6a99;
+    --vetro: #062133ee;
+    --vetro-alto: #0c3a5cf2;
+    --bordo: #1b5580;
+    --bordo-vivo: #3f92c9;
+    --lume: #ffffff1f;
+    --riflesso: #cfe8ff33;
     --fusione: screen;
-    --testo: #e8eef8;
-    --testo-tenue: #93a4bf;
-    --accento: #5b93e6;
-    --ombra: 0 2px 4px #0008, 0 28px 60px -24px #000c;
-    --ombra-alta: 0 8px 16px #0009, 0 48px 90px -28px #000e;
+    --pozza: #2f9e6847;
+    --testo: #eaf3fa;
+    --testo-tenue: #8ba8bf;
+    --accento: #4ec48c;
+    --ombra: 0 2px 4px #0009, 0 30px 60px -24px #000e;
+    --ombra-alta: 0 8px 18px #000b, 0 52px 90px -28px #000;
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) {
-      --sfondo: #eef2f9;
+      --sfondo: #eef3f7;
       --sfondo-lontano: #ffffff;
-      --vetro: #ffffffcc;
+      --pannello-basso: #b9cfe0;
+      --pannello-alto: #ffffff;
+      --vetro: #ffffffee;
       --vetro-alto: #ffffff;
-      --bordo: #d3ddec;
-      --bordo-vivo: #7ba6e4;
-      --griglia: #a3b7d38c;
-      --griglia-viva: #6f9ce0;
-      --pozza: #2b3d5c40;
-      --riflesso: #ffffffd0;
+      --bordo: #cadae6;
+      --bordo-vivo: #0b3a5b;
       --lume: #ffffff;
+      --riflesso: #ffffffd0;
       --fusione: normal;
-      --testo: #111d31;
-      --testo-tenue: #56688a;
-      --accento: #2b6cd4;
-      --ombra: 0 1px 2px #16203314, 0 18px 40px -20px #16203340;
-      --ombra-alta: 0 4px 10px #16203318, 0 34px 60px -22px #1620334d;
+      --pozza: #1f8a5640;
+      --testo: #08243a;
+      --testo-tenue: #4d6b83;
+      --accento: #1f8a56;
+      --ombra: 0 1px 2px #08243a14, 0 18px 40px -20px #08243a40;
+      --ombra-alta: 0 4px 10px #08243a1c, 0 34px 60px -22px #08243a55;
     }
   }
 
@@ -70,21 +72,19 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── La stanza ──────────────────────────────────────────────────────────
-     Fondale fisso: pavimento a griglia che sfugge verso l'orizzonte, alone
-     di luce sulla linea d'orizzonte, penombra agli angoli. Ruota con gli
-     stessi angoli del contenuto, così sembra un unico ambiente.          */
-  .stanza {
+  /* ── Il muro ────────────────────────────────────────────────────────────
+     Una parete di pannelli quadrati a profondità diverse. Il puntatore ci
+     passa sopra e i pannelli lì attorno si girano e vengono avanti, poi
+     tornano al loro posto con calma. Li costruisce il JS.               */
+  .muro {
     position: fixed;
     inset: 0;
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    perspective: 1200px;
+    perspective: 1000px;
     perspective-origin: calc(50% + var(--pox)) calc(50% + var(--poy));
-    background:
-      radial-gradient(120% 80% at 50% 42%, var(--sfondo-lontano) 0%, transparent 70%),
-      var(--sfondo);
+    background: radial-gradient(130% 90% at 50% 45%, var(--sfondo-lontano) 0%, var(--sfondo) 72%);
   }
 
   .mondo {
@@ -93,56 +93,56 @@
     transition: transform .12s linear;
   }
 
-  .stanza .mondo { position: absolute; inset: 0; }
+  .muro .mondo { position: absolute; inset: 0; }
 
-  .pavimento {
-    position: absolute;
-    top: 54%;
-    left: 50%;
-    width: 320vmax;
-    height: 200vmax;
-    margin-left: -160vmax;
-    transform-origin: 50% 0;
-    transform: rotateX(90deg);
-    background-image:
-      repeating-linear-gradient(to bottom, var(--griglia) 0 1px, transparent 1px 88px),
-      repeating-linear-gradient(to right, var(--griglia) 0 1px, transparent 1px 88px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 46%, transparent 78%);
-            mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 46%, transparent 78%);
-    animation: deriva 14s linear infinite;
-  }
-  @keyframes deriva {
-    from { background-position: 0 0, 0 0; }
-    to   { background-position: 0 88px, 0 0; }
-  }
-
-  /* Alone sulla linea d'orizzonte. */
-  .orizzonte {
+  .tessere {
     position: absolute;
     left: 50%;
-    top: 54%;
-    width: 160vmax;
-    height: 44vmax;
-    margin: -22vmax 0 0 -80vmax;
-    background: radial-gradient(50% 50% at 50% 50%, var(--griglia-viva) 0%, transparent 68%);
-    opacity: .32;
-    filter: blur(6px);
+    top: 50%;
+    display: grid;
+    grid-template-columns: repeat(var(--colonne, 1), var(--lato, 72px));
+    grid-auto-rows: var(--lato, 72px);
+    gap: 3px;
+    transform: translate(-50%, -50%);
+    transform-style: preserve-3d;
   }
 
-  /* Schermi stretti e alti: alzo l'orizzonte, così sotto le lastre resta
-     pavimento da vedere. */
-  @media (max-aspect-ratio: 4/5) {
-    .pavimento, .orizzonte { top: 63%; }
+  /* --z0 e --tono li assegna il JS una volta sola: sono la faccia fissa del
+     pannello. --rY, --rX, --zp e --acceso cambiano col puntatore. */
+  .tessera {
+    --base: color-mix(in oklab, var(--pannello-alto) calc(var(--tono, .5) * 100%), var(--pannello-basso));
+    border-radius: 2px;
+    background-color: color-mix(in oklab, var(--accento) calc(var(--acceso, 0) * 48%), var(--base));
+    background-image: linear-gradient(148deg, #ffffff1c 0%, transparent 42%, #0000002b 100%);
+    box-shadow: inset 0 1px 0 #ffffff1a, 0 3px 8px #00000047;
+    transform:
+      translateZ(calc(var(--z0, 0px) + var(--zp, 0px)))
+      rotateY(var(--rY, 0deg))
+      rotateX(var(--rX, 0deg));
+    transition: transform .6s cubic-bezier(.18,.9,.24,1), background-color .6s ease;
   }
 
-  /* Penombra agli angoli: tiene lo sguardo al centro della vetrina. */
-  .penombra {
+  /* Il velo che tiene leggibile il centro: il muro resta vivo ai bordi. */
+  .velo {
     position: absolute;
     inset: 0;
-    background: radial-gradient(115% 85% at 50% 45%, transparent 45%, var(--sfondo) 100%);
+    background:
+      radial-gradient(62% 54% at 50% 46%, var(--sfondo) 34%, transparent 100%),
+      radial-gradient(125% 95% at 50% 45%, transparent 40%, var(--sfondo) 100%);
+    opacity: .92;
   }
 
-  /* ── Il contenuto, dentro la stessa stanza ───────────────────────────── */
+  /* Schermi stretti e alti: il velo copre di più, se no il testo finisce
+     addosso ai pannelli. */
+  @media (max-aspect-ratio: 4/5) {
+    .velo {
+      background:
+        radial-gradient(80% 46% at 50% 46%, var(--sfondo) 44%, transparent 100%),
+        radial-gradient(125% 95% at 50% 45%, transparent 40%, var(--sfondo) 100%);
+    }
+  }
+
+  /* ── Il contenuto, davanti al muro ───────────────────────────────────── */
   .scena {
     position: relative;
     z-index: 1;
@@ -155,6 +155,7 @@
   header {
     margin-bottom: 3rem;
     text-align: center;
+    text-shadow: 0 1px 14px var(--sfondo), 0 1px 3px var(--sfondo);
     transform: translateZ(70px);
   }
 
@@ -169,7 +170,7 @@
   .marchio svg { width: 2rem; height: 2rem; color: var(--accento); }
 
   /* Segnaposto: cornice tratteggiata finché non arriva il logo vero. */
-  .marchio .segnaposto { opacity: .75; }
+  .marchio .segnaposto { opacity: .8; }
 
   header p {
     margin: .875rem auto 0;
@@ -198,7 +199,7 @@
     transition: transform .4s cubic-bezier(.2,.8,.2,1);
   }
 
-  /* La pozza di luce a terra, sotto la lastra. */
+  /* L'alone verde che la lastra lascia sul muro. */
   .scheda::after {
     content: "";
     position: absolute;
@@ -214,13 +215,11 @@
     pointer-events: none;
   }
 
-  /* La lastra di vetro vera e propria: è tutta un link, così si prende con un
-     clic dove capita. */
+  /* La lastra di vetro: è tutta un link, così si prende con un clic dove
+     capita. */
   .lastra {
     position: relative;
     display: flex;
-    color: inherit;
-    text-decoration: none;
     flex-direction: column;
     align-items: flex-start;
     gap: .5rem;
@@ -230,12 +229,14 @@
     border-radius: 1rem;
     background: linear-gradient(160deg, var(--vetro-alto) 0%, var(--vetro) 55%, var(--vetro) 100%);
     box-shadow: var(--ombra), inset 0 1px 0 var(--lume);
+    color: inherit;
+    text-decoration: none;
     transform: translateZ(0);
     transform-style: preserve-3d;
     transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease, border-color .3s ease;
   }
   @supports (backdrop-filter: blur(6px)) {
-    .lastra { backdrop-filter: blur(7px) saturate(125%); }
+    .lastra { backdrop-filter: blur(9px) saturate(120%); }
   }
 
   /* Il riflesso che scorre sul vetro quando muovi il puntatore. */
@@ -255,7 +256,7 @@
   .scheda:hover, .scheda:focus-within { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
   .scheda:hover .lastra, .scheda:focus-within .lastra {
     transform: translateZ(52px);
-    border-color: var(--bordo-vivo);
+    border-color: var(--accento);
     box-shadow: var(--ombra-alta);
   }
   .scheda:hover::after, .scheda:focus-within::after {
@@ -278,53 +279,59 @@
   .icona svg { width: 1.5rem; height: 1.5rem; }
 
   .lastra h2 { margin: 0; font-size: 1.1875rem; font-weight: 620; letter-spacing: -.01em; transform: translateZ(14px); }
-  .lastra:focus-visible { outline: 2px solid var(--bordo-vivo); outline-offset: .5rem; }
+  .lastra:focus-visible { outline: 2px solid var(--accento); outline-offset: .5rem; }
 
   .lastra p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; transform: translateZ(10px); }
 
   .stato {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
     margin-top: .375rem;
     padding: .1875rem .5625rem;
-    border: 1px solid var(--bordo);
+    border: 1px solid color-mix(in srgb, var(--accento) 45%, transparent);
     border-radius: 999px;
+    background: color-mix(in srgb, var(--accento) 12%, transparent);
     font-size: .75rem;
     letter-spacing: .02em;
-    color: var(--testo-tenue);
+    color: var(--accento);
     transform: translateZ(10px);
   }
+  /* La freccina dice che il progetto si apre in una pagina nuova. */
+  .stato svg { width: .8125rem; height: .8125rem; opacity: .8; }
 
   footer {
     margin-top: 4rem;
     text-align: center;
+    text-shadow: 0 1px 12px var(--sfondo);
     color: var(--testo-tenue);
     font-size: .8125rem;
     transform: translateZ(-40px);
   }
 
-  /* Senza puntatore (dito, tavoletta) la stanza dondola da sola. */
+  /* Senza puntatore (dito, tavoletta) il muro dondola da solo. */
   @media (hover: none) {
     .mondo { animation: dondolo 20s ease-in-out infinite alternate; }
   }
   @keyframes dondolo {
-    from { transform: rotateY(-7deg) rotateX(2.5deg); }
-    to   { transform: rotateY(7deg) rotateX(-1.5deg); }
+    from { transform: rotateY(-6deg) rotateX(2deg); }
+    to   { transform: rotateY(6deg) rotateX(-1.5deg); }
   }
 
-  /* Chi ha chiesto meno movimento resta in una stanza ferma. */
+  /* Chi ha chiesto meno movimento trova un muro fermo. */
   @media (prefers-reduced-motion: reduce) {
-    .pavimento { animation: none; }
     .mondo { animation: none; transition: none; }
+    .tessera { transition: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="stanza" aria-hidden="true">
+<div class="muro" aria-hidden="true">
   <div class="mondo">
-    <div class="pavimento"></div>
-    <div class="orizzonte"></div>
+    <div class="tessere"></div>
   </div>
-  <div class="penombra"></div>
+  <div class="velo"></div>
 </div>
 
 <main class="scena">
@@ -346,7 +353,7 @@
 
     <ul class="progetti">
       <li class="scheda">
-        <a class="lastra" href="https://yachtnav.effdipi.it">
+        <a class="lastra" href="https://yachtnav.effdipi.it" target="_blank" rel="noopener">
           <span class="icona" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="5" r="2"></circle>
@@ -357,19 +364,25 @@
           </span>
           <h2>YachtNav Manager</h2>
           <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
-          <span class="stato">In prova</span>
+          <span class="stato">
+            In prova
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17 17 7"></path>
+              <path d="M9 7h8v8"></path>
+            </svg>
+          </span>
         </a>
       </li>
 
       <!-- Per aggiungerne un altro, copia il blocco <li> qui sopra e cambia
-           icona, indirizzo (href), titolo e descrizione. La griglia si riorganizza
-           da sola e il JS rimette le lastre in fila nella vetrina. -->
+           icona, indirizzo (href), titolo e descrizione. La griglia si
+           riorganizza da sola e le lastre si rimettono in fila.
+           target="_blank" apre il progetto in una pagina nuova: lascialo. -->
     </ul>
 
     <footer>effdipi.it</footer>
   </div>
 </main>
-
 
 <script>
 (function () {
@@ -379,10 +392,104 @@
   var fermo = matchMedia("(prefers-reduced-motion: reduce)");
   var puntatore = matchMedia("(hover: hover) and (pointer: fine)");
 
+  /* ── Il muro ───────────────────────────────────────────────────────────
+     Una griglia di pannelli. Ognuno tiene la sua profondità e il suo tono
+     per sempre (rumore stabile sulle coordinate), così il muro non cambia
+     faccia a ogni ridimensionamento. */
+  var contenitore = document.querySelector(".tessere");
+  var tessere = [], colonne = 0, righe = 0, passo = 0, x0 = 0, y0 = 0;
+
+  function caso(c, r) {
+    var n = Math.sin(c * 127.1 + r * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  }
+
+  function costruisci() {
+    if (!contenitore) return;
+
+    var lato = Math.max(52, Math.min(104, Math.round(innerWidth / 17)));
+    colonne = Math.ceil(innerWidth / (lato + 3)) + 2;
+    righe = Math.ceil(innerHeight / (lato + 3)) + 2;
+
+    /* Su schermi grandi i pannelli si allargano invece di moltiplicarsi. */
+    while (colonne * righe > 700 && lato < 200) {
+      lato += 10;
+      colonne = Math.ceil(innerWidth / (lato + 3)) + 2;
+      righe = Math.ceil(innerHeight / (lato + 3)) + 2;
+    }
+
+    passo = lato + 3;
+    x0 = (innerWidth - (colonne * passo - 3)) / 2;
+    y0 = (innerHeight - (righe * passo - 3)) / 2;
+
+    contenitore.style.setProperty("--lato", lato + "px");
+    contenitore.style.setProperty("--colonne", colonne);
+
+    var pezzi = document.createDocumentFragment();
+    tessere = [];
+    for (var r = 0; r < righe; r++) {
+      for (var c = 0; c < colonne; c++) {
+        var a = caso(c, r);
+        var t = document.createElement("i");
+        t.className = "tessera";
+        t.style.setProperty("--z0", Math.round((a - .5) * 76) + "px");
+        t.style.setProperty("--tono", a.toFixed(3));
+        pezzi.appendChild(t);
+        tessere.push({ e: t, x: x0 + c * passo + lato / 2, y: y0 + r * passo + lato / 2 });
+      }
+    }
+    contenitore.textContent = "";
+    contenitore.appendChild(pezzi);
+  }
+
+  var accese = [];
+
+  function spegni(t) {
+    var s = t.e.style;
+    s.removeProperty("--rY");
+    s.removeProperty("--rX");
+    s.removeProperty("--zp");
+    s.removeProperty("--acceso");
+  }
+
+  /* L'onda: i pannelli attorno al puntatore si girano e vengono avanti,
+     con addosso il verde del marchio. */
+  function onda(px, py) {
+    var R = 300, i;
+    for (i = 0; i < accese.length; i++) spegni(accese[i]);
+    accese.length = 0;
+    if (px === null || !colonne) return;
+
+    var c1 = Math.max(0, Math.floor((px - R - x0) / passo));
+    var c2 = Math.min(colonne - 1, Math.ceil((px + R - x0) / passo));
+    var r1 = Math.max(0, Math.floor((py - R - y0) / passo));
+    var r2 = Math.min(righe - 1, Math.ceil((py + R - y0) / passo));
+
+    for (var r = r1; r <= r2; r++) {
+      for (var c = c1; c <= c2; c++) {
+        var t = tessere[r * colonne + c];
+        if (!t) continue;
+        var dx = t.x - px, dy = t.y - py;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d > R) continue;
+
+        var f = 1 - d / R;
+        f = f * f * (3 - 2 * f);
+
+        var s = t.e.style;
+        s.setProperty("--rY", (-dx / R * 66 * f).toFixed(1) + "deg");
+        s.setProperty("--rX", (dy / R * 50 * f).toFixed(1) + "deg");
+        s.setProperty("--zp", Math.round(f * 82) + "px");
+        s.setProperty("--acceso", f.toFixed(3));
+        accese.push(t);
+      }
+    }
+  }
+
   /* ── Le lastre in vetrina ──────────────────────────────────────────────
-     Le schede stanno su un arco di cerchio rivolto verso chi guarda: quelle
-     ai lati girano verso il centro e stanno un filo più indietro. Si misura
-     sulla scatola di layout (offsetLeft), che le rotazioni non toccano. */
+     Stanno su un arco rivolto verso chi guarda: quelle ai lati girano verso
+     il centro e stanno un filo più indietro. Si misura sulla scatola di
+     layout (offsetLeft), che le rotazioni non toccano. */
   var RAGGIO = 1500;
 
   function disponi() {
@@ -392,8 +499,7 @@
     var sinistra = Infinity, destra = -Infinity, i, s, centri = [];
     for (i = 0; i < schede.length; i++) {
       s = schede[i];
-      var c = s.offsetLeft + s.offsetWidth / 2;
-      centri.push(c);
+      centri.push(s.offsetLeft + s.offsetWidth / 2);
       if (s.offsetLeft < sinistra) sinistra = s.offsetLeft;
       if (s.offsetLeft + s.offsetWidth > destra) destra = s.offsetLeft + s.offsetWidth;
     }
@@ -408,49 +514,63 @@
   }
 
   var inCoda = false;
-  function ridisponi() {
+  function rifai() {
     if (inCoda) return;
     inCoda = true;
-    requestAnimationFrame(function () { inCoda = false; disponi(); });
+    requestAnimationFrame(function () {
+      inCoda = false;
+      costruisci();
+      disponi();
+    });
   }
 
+  costruisci();
   disponi();
-  addEventListener("resize", ridisponi);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(ridisponi);
+  addEventListener("resize", rifai);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(disponi);
 
   /* ── Lo sguardo ────────────────────────────────────────────────────────
-     Il puntatore ruota la stanza di pochi gradi, con un po' di inerzia, e
-     sposta il riflesso sul vetro. */
+     Il puntatore ruota la scena di pochi gradi, sposta il riflesso sul
+     vetro e muove l'onda sul muro. */
   if (fermo.matches || !puntatore.matches) return;
 
-  var mx = 0, my = 0, vx = 0, vy = 0, giro = 0;
+  var mx = 0, my = 0, vx = 0, vy = 0, giro = 0, sx = null, sy = null, daFare = false;
 
-  function passo() {
+  function sveglia() {
+    if (!giro) giro = requestAnimationFrame(battito);
+  }
+
+  function battito() {
+    giro = 0;
+
+    if (daFare) {
+      daFare = false;
+      onda(sx, sy);
+    }
+
     vx += (mx - vx) * .08;
     vy += (my - vy) * .08;
 
-    radice.style.setProperty("--ry", (vx * 11).toFixed(2) + "deg");
-    radice.style.setProperty("--rx", (-vy * 6.5).toFixed(2) + "deg");
+    radice.style.setProperty("--ry", (vx * 9).toFixed(2) + "deg");
+    radice.style.setProperty("--rx", (-vy * 5.5).toFixed(2) + "deg");
     radice.style.setProperty("--pox", (-vx * 7).toFixed(2) + "%");
     radice.style.setProperty("--poy", (-vy * 5).toFixed(2) + "%");
     radice.style.setProperty("--luce", (.5 - vx * .45).toFixed(3));
 
-    if (Math.abs(mx - vx) > .0005 || Math.abs(my - vy) > .0005) {
-      giro = requestAnimationFrame(passo);
-    } else {
-      giro = 0;
-    }
+    if (Math.abs(mx - vx) > .0005 || Math.abs(my - vy) > .0005) sveglia();
   }
 
   addEventListener("pointermove", function (e) {
-    mx = (e.clientX / innerWidth) * 2 - 1;
-    my = (e.clientY / innerHeight) * 2 - 1;
-    if (!giro) giro = requestAnimationFrame(passo);
+    sx = e.clientX; sy = e.clientY; daFare = true;
+    mx = (sx / innerWidth) * 2 - 1;
+    my = (sy / innerHeight) * 2 - 1;
+    sveglia();
   }, { passive: true });
 
   addEventListener("pointerleave", function () {
+    sx = null; sy = null; daFare = true;
     mx = 0; my = 0;
-    if (!giro) giro = requestAnimationFrame(passo);
+    sveglia();
   });
 })();
 </script>
