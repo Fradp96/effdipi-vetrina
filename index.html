@@ -8,58 +8,171 @@
 <meta name="robots" content="noindex, nofollow">
 <style>
   :root {
-    --sfondo: #0e1626;
-    --sfondo-scheda: #16203350;
-    --bordo: #24334d;
-    --bordo-vivo: #3f6fb5;
+    /* Rotazione della stanza: la scrive il JS seguendo il puntatore. */
+    --rx: 0deg;
+    --ry: 0deg;
+    --pox: 0%;
+    --poy: 0%;
+    --luce: .5;
+
+    --sfondo: #080e1a;
+    --sfondo-lontano: #0d1a30;
+    --vetro: #16243c66;
+    --vetro-alto: #1e3155aa;
+    --bordo: #33507e;
+    --bordo-vivo: #6f9de4;
+    --griglia: #3f6fb552;
+    --griglia-viva: #5b93e6;
+    --pozza: #6ba0ee52;
+    --riflesso: #b9d4ff40;
+    --lume: #ffffff2b;
+    --fusione: screen;
     --testo: #e8eef8;
     --testo-tenue: #93a4bf;
     --accento: #5b93e6;
-    --ombra: 0 1px 2px #0006, 0 12px 32px -12px #0009;
+    --ombra: 0 2px 4px #0008, 0 28px 60px -24px #000c;
+    --ombra-alta: 0 8px 16px #0009, 0 48px 90px -28px #000e;
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) {
-      --sfondo: #f6f8fc;
-      --sfondo-scheda: #ffffff;
-      --bordo: #dde4ef;
-      --bordo-vivo: #a9c4ea;
-      --testo: #162033;
-      --testo-tenue: #5a6a85;
+      --sfondo: #eef2f9;
+      --sfondo-lontano: #ffffff;
+      --vetro: #ffffffcc;
+      --vetro-alto: #ffffff;
+      --bordo: #d3ddec;
+      --bordo-vivo: #7ba6e4;
+      --griglia: #a3b7d38c;
+      --griglia-viva: #6f9ce0;
+      --pozza: #2b3d5c40;
+      --riflesso: #ffffffd0;
+      --lume: #ffffff;
+      --fusione: normal;
+      --testo: #111d31;
+      --testo-tenue: #56688a;
       --accento: #2b6cd4;
-      --ombra: 0 1px 2px #16203312, 0 10px 28px -14px #16203330;
+      --ombra: 0 1px 2px #16203314, 0 18px 40px -20px #16203340;
+      --ombra-alta: 0 4px 10px #16203318, 0 34px 60px -22px #1620334d;
     }
   }
 
   * { box-sizing: border-box; }
+
+  html { background: var(--sfondo); }
 
   body {
     margin: 0;
     min-height: 100vh;
     display: grid;
     place-items: center;
-    padding: 2.5rem 1.25rem;
-    background: var(--sfondo);
+    padding: 3rem 1.25rem 4rem;
     color: var(--testo);
     font: 400 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
-  main { width: 100%; max-width: 44rem; }
+  /* ── La stanza ──────────────────────────────────────────────────────────
+     Fondale fisso: pavimento a griglia che sfugge verso l'orizzonte, alone
+     di luce sulla linea d'orizzonte, penombra agli angoli. Ruota con gli
+     stessi angoli del contenuto, così sembra un unico ambiente.          */
+  .stanza {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    perspective: 1200px;
+    perspective-origin: calc(50% + var(--pox)) calc(50% + var(--poy));
+    background:
+      radial-gradient(120% 80% at 50% 42%, var(--sfondo-lontano) 0%, transparent 70%),
+      var(--sfondo);
+  }
 
-  header { margin-bottom: 2.5rem; }
+  .mondo {
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: transform .12s linear;
+  }
+
+  .stanza .mondo { position: absolute; inset: 0; }
+
+  .pavimento {
+    position: absolute;
+    top: 54%;
+    left: 50%;
+    width: 320vmax;
+    height: 200vmax;
+    margin-left: -160vmax;
+    transform-origin: 50% 0;
+    transform: rotateX(90deg);
+    background-image:
+      repeating-linear-gradient(to bottom, var(--griglia) 0 1px, transparent 1px 88px),
+      repeating-linear-gradient(to right, var(--griglia) 0 1px, transparent 1px 88px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 46%, transparent 78%);
+            mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 46%, transparent 78%);
+    animation: deriva 14s linear infinite;
+  }
+  @keyframes deriva {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 0 88px, 0 0; }
+  }
+
+  /* Alone sulla linea d'orizzonte. */
+  .orizzonte {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    width: 160vmax;
+    height: 44vmax;
+    margin: -22vmax 0 0 -80vmax;
+    background: radial-gradient(50% 50% at 50% 50%, var(--griglia-viva) 0%, transparent 68%);
+    opacity: .32;
+    filter: blur(6px);
+  }
+
+  /* Schermi stretti e alti: alzo l'orizzonte, così sotto le lastre resta
+     pavimento da vedere. */
+  @media (max-aspect-ratio: 4/5) {
+    .pavimento, .orizzonte { top: 63%; }
+  }
+
+  /* Penombra agli angoli: tiene lo sguardo al centro della vetrina. */
+  .penombra {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(115% 85% at 50% 45%, transparent 45%, var(--sfondo) 100%);
+  }
+
+  /* ── Il contenuto, dentro la stessa stanza ───────────────────────────── */
+  .scena {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 46rem;
+    perspective: 1200px;
+    perspective-origin: calc(50% + var(--pox)) calc(50% + var(--poy));
+  }
+
+  header {
+    margin-bottom: 3rem;
+    text-align: center;
+    transform: translateZ(70px);
+  }
 
   .marchio {
     display: inline-flex;
     align-items: center;
-    gap: .625rem;
+    gap: .75rem;
     font-size: 1.5rem;
     font-weight: 650;
     letter-spacing: -.02em;
   }
-  .marchio svg { width: 1.75rem; height: 1.75rem; color: var(--accento); }
+  .marchio svg { width: 2rem; height: 2rem; color: var(--accento); }
+
+  /* Segnaposto: cornice tratteggiata finché non arriva il logo vero. */
+  .marchio .segnaposto { opacity: .75; }
 
   header p {
-    margin: .75rem 0 0;
+    margin: .875rem auto 0;
     color: var(--testo-tenue);
     font-size: 1.0625rem;
     max-width: 34rem;
@@ -67,87 +180,279 @@
 
   .progetti {
     display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 3.25rem 1.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
+    justify-content: center;
     list-style: none;
     margin: 0;
     padding: 0;
+    transform-style: preserve-3d;
   }
 
+  /* La scheda è il posto nella vetrina: arco e profondità li calcola il JS
+     in base a dov'è finita nella griglia (--arc, --dz). */
   .scheda {
     position: relative;
+    transform: translateZ(var(--dz, 0px)) rotateY(var(--arc, 0deg));
+    transform-style: preserve-3d;
+    transition: transform .4s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* La pozza di luce a terra, sotto la lastra. */
+  .scheda::after {
+    content: "";
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: -1.75rem;
+    height: 2.75rem;
+    background: radial-gradient(50% 50% at 50% 50%, var(--pozza) 0%, transparent 72%);
+    transform: translateZ(-24px) rotateX(72deg);
+    filter: blur(7px);
+    opacity: .85;
+    transition: opacity .4s ease, transform .4s cubic-bezier(.2,.8,.2,1);
+    pointer-events: none;
+  }
+
+  /* La lastra di vetro vera e propria: è tutta un link, così si prende con un
+     clic dove capita. */
+  .lastra {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    padding: 1.375rem 1.5rem;
-    border: 1px solid var(--bordo);
-    border-radius: .875rem;
-    background: var(--sfondo-scheda);
-    box-shadow: var(--ombra);
-    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-  }
-  .scheda:hover, .scheda:focus-within {
-    border-color: var(--bordo-vivo);
-    transform: translateY(-2px);
-  }
-
-  .scheda h2 { margin: 0; font-size: 1.125rem; font-weight: 620; letter-spacing: -.01em; }
-
-  .scheda h2 a {
     color: inherit;
     text-decoration: none;
-    outline-offset: .35rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: 1.5rem 1.5rem 1.375rem;
+    border: 1px solid var(--bordo);
+    border-top-color: var(--bordo-vivo);
+    border-radius: 1rem;
+    background: linear-gradient(160deg, var(--vetro-alto) 0%, var(--vetro) 55%, var(--vetro) 100%);
+    box-shadow: var(--ombra), inset 0 1px 0 var(--lume);
+    transform: translateZ(0);
+    transform-style: preserve-3d;
+    transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease, border-color .3s ease;
   }
-  /* Rende cliccabile tutta la scheda senza annidare i link. */
-  .scheda h2 a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  @supports (backdrop-filter: blur(6px)) {
+    .lastra { backdrop-filter: blur(7px) saturate(125%); }
+  }
 
-  .scheda p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; }
+  /* Il riflesso che scorre sul vetro quando muovi il puntatore. */
+  .lastra::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(102deg, transparent 26%, var(--riflesso) 44%, transparent 63%);
+    background-size: 300% 100%;
+    background-position: calc((var(--luce) + var(--sfasa, 0)) * 100%) 0;
+    mix-blend-mode: var(--fusione);
+    opacity: .85;
+    pointer-events: none;
+  }
+
+  .scheda:hover, .scheda:focus-within { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
+  .scheda:hover .lastra, .scheda:focus-within .lastra {
+    transform: translateZ(52px);
+    border-color: var(--bordo-vivo);
+    box-shadow: var(--ombra-alta);
+  }
+  .scheda:hover::after, .scheda:focus-within::after {
+    opacity: .55;
+    transform: translateZ(-24px) rotateX(72deg) scale(1.14);
+  }
+
+  .icona {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: .25rem;
+    border: 1px solid var(--bordo);
+    border-radius: .75rem;
+    background: #ffffff0d;
+    color: var(--accento);
+    transform: translateZ(18px);
+  }
+  .icona svg { width: 1.5rem; height: 1.5rem; }
+
+  .lastra h2 { margin: 0; font-size: 1.1875rem; font-weight: 620; letter-spacing: -.01em; transform: translateZ(14px); }
+  .lastra:focus-visible { outline: 2px solid var(--bordo-vivo); outline-offset: .5rem; }
+
+  .lastra p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; transform: translateZ(10px); }
 
   .stato {
-    align-self: flex-start;
-    margin-top: .25rem;
-    padding: .1875rem .5rem;
+    margin-top: .375rem;
+    padding: .1875rem .5625rem;
     border: 1px solid var(--bordo);
     border-radius: 999px;
     font-size: .75rem;
     letter-spacing: .02em;
     color: var(--testo-tenue);
+    transform: translateZ(10px);
   }
 
   footer {
-    margin-top: 3rem;
+    margin-top: 4rem;
+    text-align: center;
     color: var(--testo-tenue);
     font-size: .8125rem;
+    transform: translateZ(-40px);
+  }
+
+  /* Senza puntatore (dito, tavoletta) la stanza dondola da sola. */
+  @media (hover: none) {
+    .mondo { animation: dondolo 20s ease-in-out infinite alternate; }
+  }
+  @keyframes dondolo {
+    from { transform: rotateY(-7deg) rotateX(2.5deg); }
+    to   { transform: rotateY(7deg) rotateX(-1.5deg); }
+  }
+
+  /* Chi ha chiesto meno movimento resta in una stanza ferma. */
+  @media (prefers-reduced-motion: reduce) {
+    .pavimento { animation: none; }
+    .mondo { animation: none; transition: none; }
   }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div class="marchio">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="5" r="2"></circle>
-        <path d="M12 7v14"></path>
-        <path d="M6 11h12"></path>
-        <path d="M5 15a7 7 0 0 0 14 0"></path>
-      </svg>
-      effdipi
-    </div>
-    <p>Progetti in lavorazione. Scegli quello che ti interessa.</p>
-  </header>
 
-  <ul class="progetti">
-    <li class="scheda">
-      <h2><a href="https://yachtnav.effdipi.it">YachtNav Manager</a></h2>
-      <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
-      <span class="stato">In prova</span>
-    </li>
+<div class="stanza" aria-hidden="true">
+  <div class="mondo">
+    <div class="pavimento"></div>
+    <div class="orizzonte"></div>
+  </div>
+  <div class="penombra"></div>
+</div>
 
-    <!-- Per aggiungerne un altro, copia il blocco qui sopra e cambia
-         indirizzo, titolo e descrizione. La griglia si riorganizza da sola. -->
-  </ul>
+<main class="scena">
+  <div class="mondo">
+    <header>
+      <div class="marchio">
+        <!-- SEGNAPOSTO: sostituisci questo <svg> con il logo effdipi.
+             Basta che sia un SVG con viewBox 0 0 24 24 e stroke/fill
+             "currentColor": prende da sé il colore dell'accento. -->
+        <svg class="segnaposto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke-dasharray="3 3.5"></rect>
+          <path d="M14 8h-1.75A2.25 2.25 0 0 0 10 10.25V16"></path>
+          <path d="M8.25 12h4"></path>
+        </svg>
+        effdipi
+      </div>
+      <p>Progetti in lavorazione. Scegli quello che ti interessa.</p>
+    </header>
 
-  <footer>effdipi.it</footer>
+    <ul class="progetti">
+      <li class="scheda">
+        <a class="lastra" href="https://yachtnav.effdipi.it">
+          <span class="icona" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="5" r="2"></circle>
+              <path d="M12 7v14"></path>
+              <path d="M6 11h12"></path>
+              <path d="M5 15a7 7 0 0 0 14 0"></path>
+            </svg>
+          </span>
+          <h2>YachtNav Manager</h2>
+          <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
+          <span class="stato">In prova</span>
+        </a>
+      </li>
+
+      <!-- Per aggiungerne un altro, copia il blocco <li> qui sopra e cambia
+           icona, indirizzo (href), titolo e descrizione. La griglia si riorganizza
+           da sola e il JS rimette le lastre in fila nella vetrina. -->
+    </ul>
+
+    <footer>effdipi.it</footer>
+  </div>
 </main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  var radice = document.documentElement;
+  var fermo = matchMedia("(prefers-reduced-motion: reduce)");
+  var puntatore = matchMedia("(hover: hover) and (pointer: fine)");
+
+  /* ── Le lastre in vetrina ──────────────────────────────────────────────
+     Le schede stanno su un arco di cerchio rivolto verso chi guarda: quelle
+     ai lati girano verso il centro e stanno un filo più indietro. Si misura
+     sulla scatola di layout (offsetLeft), che le rotazioni non toccano. */
+  var RAGGIO = 1500;
+
+  function disponi() {
+    var schede = document.querySelectorAll(".progetti .scheda");
+    if (!schede.length) return;
+
+    var sinistra = Infinity, destra = -Infinity, i, s, centri = [];
+    for (i = 0; i < schede.length; i++) {
+      s = schede[i];
+      var c = s.offsetLeft + s.offsetWidth / 2;
+      centri.push(c);
+      if (s.offsetLeft < sinistra) sinistra = s.offsetLeft;
+      if (s.offsetLeft + s.offsetWidth > destra) destra = s.offsetLeft + s.offsetWidth;
+    }
+    var centro = (sinistra + destra) / 2;
+
+    for (i = 0; i < schede.length; i++) {
+      var dx = centri[i] - centro;
+      schede[i].style.setProperty("--arc", (-Math.atan(dx / RAGGIO) * 180 / Math.PI).toFixed(2) + "deg");
+      schede[i].style.setProperty("--dz", (-(dx * dx) / (2 * RAGGIO)).toFixed(1) + "px");
+      schede[i].style.setProperty("--sfasa", (dx / 1400).toFixed(3));
+    }
+  }
+
+  var inCoda = false;
+  function ridisponi() {
+    if (inCoda) return;
+    inCoda = true;
+    requestAnimationFrame(function () { inCoda = false; disponi(); });
+  }
+
+  disponi();
+  addEventListener("resize", ridisponi);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(ridisponi);
+
+  /* ── Lo sguardo ────────────────────────────────────────────────────────
+     Il puntatore ruota la stanza di pochi gradi, con un po' di inerzia, e
+     sposta il riflesso sul vetro. */
+  if (fermo.matches || !puntatore.matches) return;
+
+  var mx = 0, my = 0, vx = 0, vy = 0, giro = 0;
+
+  function passo() {
+    vx += (mx - vx) * .08;
+    vy += (my - vy) * .08;
+
+    radice.style.setProperty("--ry", (vx * 11).toFixed(2) + "deg");
+    radice.style.setProperty("--rx", (-vy * 6.5).toFixed(2) + "deg");
+    radice.style.setProperty("--pox", (-vx * 7).toFixed(2) + "%");
+    radice.style.setProperty("--poy", (-vy * 5).toFixed(2) + "%");
+    radice.style.setProperty("--luce", (.5 - vx * .45).toFixed(3));
+
+    if (Math.abs(mx - vx) > .0005 || Math.abs(my - vy) > .0005) {
+      giro = requestAnimationFrame(passo);
+    } else {
+      giro = 0;
+    }
+  }
+
+  addEventListener("pointermove", function (e) {
+    mx = (e.clientX / innerWidth) * 2 - 1;
+    my = (e.clientY / innerHeight) * 2 - 1;
+    if (!giro) giro = requestAnimationFrame(passo);
+  }, { passive: true });
+
+  addEventListener("pointerleave", function () {
+    mx = 0; my = 0;
+    if (!giro) giro = requestAnimationFrame(passo);
+  });
+})();
+</script>
 </body>
 </html>
