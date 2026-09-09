@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Collaudo YachtNav Manager — scheda del tester</title>
+<style>
+:root{
+  --blu:#12395f; --blu-chiaro:#2e6ea6; --viola:#6d5aa8; --sabbia:#f6efe1;
+  --carta:#ffffff; --fondo:#f2f4f7; --testo:#16202b; --tenue:#5d6b7a;
+  --bordo:#dfe4ea; --ok:#1f8b4d; --ko:#c0392b; --dubbio:#c77b12; --na:#7b8794;
+  --ombra:0 1px 2px rgba(18,57,95,.06), 0 6px 20px rgba(18,57,95,.07);
+  --raggio:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --carta:#151d27; --fondo:#0e141c; --testo:#e7edf4; --tenue:#9aa8b7;
+    --bordo:#28323e; --sabbia:#1d2530; --blu:#8fc0ea; --blu-chiaro:#5fa3dc;
+    --viola:#a894e6; --ok:#4cc281; --ko:#ef7a6d; --dubbio:#e0a33f; --na:#8b98a6;
+    --ombra:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--fondo); color:var(--testo);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:4rem;
+}
+.contenitore{max-width:940px;margin:0 auto;padding:0 1rem}
+a{color:var(--blu-chiaro)}
+
+/* --- testata --- */
+header.testata{
+  background:linear-gradient(135deg,#12395f 0%,#1c5386 55%,#6d5aa8 100%);
+  color:#fff; padding:2rem 0 1.6rem;
+}
+@media (prefers-color-scheme: dark){ header.testata{background:linear-gradient(135deg,#0d1a28 0%,#16324c 55%,#2e2748 100%)} }
+header.testata h1{margin:0 0 .4rem;font-size:1.65rem;letter-spacing:-.01em}
+header.testata p{margin:.35rem 0;opacity:.94;max-width:64ch}
+.occhiello{text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;opacity:.8;margin:0 0 .5rem}
+
+/* --- barra appiccicata --- */
+.barra{
+  position:sticky; top:0; z-index:30; background:var(--carta);
+  border-bottom:1px solid var(--bordo); box-shadow:var(--ombra);
+}
+.barra .contenitore{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;padding-top:.6rem;padding-bottom:.6rem}
+.avanzamento{flex:1 1 220px;min-width:180px}
+.avanzamento .etichetta{font-size:.8rem;color:var(--tenue);display:flex;justify-content:space-between;gap:.5rem;margin-bottom:.25rem}
+.tacca{height:8px;background:var(--bordo);border-radius:99px;overflow:hidden}
+.tacca i{display:block;height:100%;background:linear-gradient(90deg,var(--blu-chiaro),var(--viola));width:0;transition:width .25s}
+.filtri{display:flex;gap:.35rem;flex-wrap:wrap}
+.filtri button{
+  border:1px solid var(--bordo); background:transparent; color:var(--tenue);
+  border-radius:99px; padding:.4rem .85rem; font-size:.85rem; cursor:pointer; min-height:40px;
+}
+.filtri button[aria-pressed="true"]{background:var(--blu);color:#fff;border-color:var(--blu)}
+@media (prefers-color-scheme: dark){ .filtri button[aria-pressed="true"]{color:#0e141c} }
+
+/* --- schede --- */
+section.scheda{
+  background:var(--carta); border:1px solid var(--bordo); border-radius:var(--raggio);
+  margin:1rem 0; box-shadow:var(--ombra); overflow:hidden; scroll-margin-top:80px;
+}
+.capo{
+  display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;
+  background:none;border:0;color:inherit;font:inherit;cursor:pointer;
+  padding:.9rem 1rem; min-height:56px;
+}
+.capo:hover{background:var(--sabbia)}
+.capo .num{
+  flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--sabbia);color:var(--blu);
+  display:grid;place-items:center;font-size:.8rem;font-weight:700;
+}
+@media (prefers-color-scheme: dark){ .capo .num{background:#22303f} }
+.capo h2{margin:0;font-size:1.02rem;flex:1 1 auto;font-weight:650}
+.capo .conteggio{font-size:.78rem;color:var(--tenue);white-space:nowrap}
+.capo .freccia{transition:transform .2s;color:var(--tenue)}
+.scheda[data-chiusa="1"] .freccia{transform:rotate(-90deg)}
+.scheda[data-chiusa="1"] .corpo{display:none}
+.corpo{padding:0 1rem 1rem}
+.introduzione{margin:.1rem 0 .9rem;color:var(--tenue);font-size:.9rem;border-left:3px solid var(--sabbia);padding-left:.75rem}
+@media (prefers-color-scheme: dark){ .introduzione{border-left-color:#2b3644} }
+
+/* --- voci --- */
+.voce{padding:.75rem 0;border-top:1px solid var(--bordo)}
+.voce:first-child{border-top:0}
+.voce.nascosta{display:none}
+.testo{display:block;margin-bottom:.55rem}
+.testo .indice{color:var(--tenue);font-variant-numeric:tabular-nums;margin-right:.4rem;font-size:.85rem}
+.suggerimento{display:block;color:var(--tenue);font-size:.84rem;margin-top:.2rem}
+.esiti{display:flex;gap:.4rem;flex-wrap:wrap}
+.esiti label{
+  border:1px solid var(--bordo);border-radius:99px;padding:.3rem .8rem;font-size:.85rem;
+  cursor:pointer;color:var(--tenue);background:transparent;user-select:none;
+  display:inline-flex;align-items:center;min-height:42px;position:relative;
+}
+.esiti input{position:absolute;opacity:0;width:0;height:0}
+.esiti label:has(input:focus-visible){outline:2px solid var(--blu-chiaro);outline-offset:2px}
+.esiti label:has(input:checked){color:#fff;border-color:transparent;font-weight:600}
+.esiti label.e-ok:has(input:checked){background:var(--ok)}
+.esiti label.e-ko:has(input:checked){background:var(--ko)}
+.esiti label.e-dubbio:has(input:checked){background:var(--dubbio)}
+.esiti label.e-na:has(input:checked){background:var(--na)}
+@media (prefers-color-scheme: dark){ .esiti label:has(input:checked){color:#0e141c} }
+.voce textarea.nota{
+  margin-top:.55rem;width:100%;min-height:40px;resize:vertical;
+  border:1px dashed var(--bordo);border-radius:8px;padding:.45rem .6rem;
+  font:inherit;font-size:.9rem;background:transparent;color:var(--testo);
+}
+.voce textarea.nota:focus{border-style:solid;outline:2px solid var(--blu-chiaro);outline-offset:1px}
+.voce[data-esito="ko"]{border-left:3px solid var(--ko);padding-left:.65rem;margin-left:-.65rem}
+.voce[data-esito="dubbio"]{border-left:3px solid var(--dubbio);padding-left:.65rem;margin-left:-.65rem}
+
+/* Col dito i bersagli devono stare sopra i 44 px: col mouse no, altrimenti
+   la scrivania si gonfia. Stessa regola dell'app. */
+@media (pointer:coarse){
+  .esiti label{min-height:44px;padding:.4rem .95rem}
+  .filtri button{min-height:44px}
+  .bottone.piccolo{min-height:44px}
+  .stelle label{font-size:1.8rem;padding:.3rem}
+}
+
+/* --- moduli liberi --- */
+.campo{margin-bottom:1rem}
+.campo > label,.campo .didascalia{display:block;font-weight:600;margin-bottom:.3rem;font-size:.94rem}
+.campo .aiuto{font-weight:400;color:var(--tenue);font-size:.85rem;display:block;margin:.1rem 0 .4rem}
+input[type=text],input[type=date],select,textarea{
+  width:100%;border:1px solid var(--bordo);border-radius:8px;padding:.55rem .7rem;
+  font:inherit;background:var(--carta);color:var(--testo);min-height:44px;
+}
+textarea{min-height:120px;resize:vertical;line-height:1.55}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blu-chiaro);outline-offset:1px;border-color:var(--blu-chiaro)}
+.griglia{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+
+/* --- problemi --- */
+.problema{border:1px solid var(--bordo);border-radius:var(--raggio);padding:.9rem;margin-bottom:.9rem;background:var(--sabbia)}
+@media (prefers-color-scheme: dark){ .problema{background:#1a222d} }
+.problema .riga1{display:flex;gap:.5rem;align-items:center;margin-bottom:.7rem}
+.problema .riga1 .etichetta{font-weight:700;color:var(--blu);font-size:.85rem;flex:1}
+.bottone{
+  border:1px solid var(--bordo);background:var(--carta);color:var(--testo);
+  border-radius:8px;padding:.5rem .9rem;font:inherit;font-size:.9rem;cursor:pointer;min-height:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.bottone:hover{border-color:var(--blu-chiaro)}
+.bottone.primario{background:var(--blu);color:#fff;border-color:var(--blu);font-weight:600}
+@media (prefers-color-scheme: dark){ .bottone.primario{color:#0e141c} }
+.bottone.pericolo{color:var(--ko);border-color:var(--ko)}
+.bottone.piccolo{padding:.3rem .65rem;min-height:36px;font-size:.84rem}
+
+/* --- voti --- */
+.voto{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.6rem 0;border-top:1px solid var(--bordo)}
+.voto:first-of-type{border-top:0}
+.voto .nome{flex:1 1 200px;font-size:.95rem}
+.stelle{display:flex;gap:.2rem}
+.stelle label{cursor:pointer;font-size:1.55rem;line-height:1;color:var(--bordo);padding:.15rem;position:relative}
+.stelle input{position:absolute;opacity:0;width:0;height:0}
+.stelle label.accesa{color:var(--dubbio)}
+.stelle label:has(input:focus-visible){outline:2px solid var(--blu-chiaro);outline-offset:2px;border-radius:6px}
+
+/* --- piede --- */
+.azioni{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.2rem 0}
+.stato-salvataggio{font-size:.82rem;color:var(--tenue);min-height:1.3em;margin:.6rem 0 0}
+footer.piede{color:var(--tenue);font-size:.85rem;padding:1.5rem 0 3rem;text-align:center}
+.avviso{background:var(--sabbia);border:1px solid var(--bordo);border-radius:var(--raggio);padding:.9rem 1rem;font-size:.88rem;color:var(--tenue)}
+@media (prefers-color-scheme: dark){ .avviso{background:#1a222d} }
+.indice-sezioni{display:flex;flex-wrap:wrap;gap:.35rem;margin:1rem 0 0}
+.indice-sezioni a{
+  font-size:.8rem;text-decoration:none;color:var(--tenue);border:1px solid var(--bordo);
+  border-radius:99px;padding:.3rem .65rem;background:var(--carta);
+}
+.indice-sezioni a:hover{border-color:var(--blu-chiaro);color:var(--blu-chiaro)}
+@media print{
+  .barra,.filtri,.azioni,.indice-sezioni,.bottone,.avviso{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .scheda[data-chiusa="1"] .corpo{display:block}
+  section.scheda{break-inside:avoid;box-shadow:none}
+  header.testata{background:none;color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="testata">
+  <div class="contenitore">
+    <p class="occhiello">YachtNav Manager · prova sul campo</p>
+    <h1>Scheda di collaudo</h1>
+    <p>Grazie per il tempo che ci metti. Non serve fare tutto: prova quello che
+       useresti davvero, e dove qualcosa non torna scrivilo con parole tue —
+       anche poche righe bastano.</p>
+    <p><strong>Alla fine</strong> premi <em>Salva e scarica</em> in fondo alla
+       pagina e mandami il file. Quello che scrivi resta su questo dispositivo,
+       quindi puoi chiudere e riprendere quando vuoi.</p>
+  </div>
+</header>
+
+<div class="barra">
+  <div class="contenitore">
+    <div class="avanzamento">
+      <div class="etichetta"><span id="etichetta-avanzamento">0 su 0 provate</span><span id="riepilogo-esiti"></span></div>
+      <div class="tacca"><i id="tacca"></i></div>
+    </div>
+    <div class="filtri" role="group" aria-label="Filtra le prove">
+      <button type="button" data-filtro="tutte" aria-pressed="true">Tutte</button>
+      <button type="button" data-filtro="dafare" aria-pressed="false">Da fare</button>
+      <button type="button" data-filtro="problemi" aria-pressed="false">Problemi</button>
+      <button type="button" id="comprimi">Comprimi tutto</button>
+    </div>
+  </div>
+</div>
+
+<main class="contenitore">
+  <nav id="indice" class="indice-sezioni" aria-label="Indice delle sezioni"></nav>
+  <div id="sezioni"></div>
+
+  <p class="stato-salvataggio" id="stato-salvataggio"></p>
+
+  <div class="azioni">
+    <button type="button" class="bottone primario" id="scarica">Salva e scarica (.json)</button>
+    <button type="button" class="bottone" id="scarica-testo">Scarica in chiaro (.txt)</button>
+    <button type="button" class="bottone" id="copia">Copia il riepilogo</button>
+    <button type="button" class="bottone" id="email">Manda per email</button>
+    <button type="button" class="bottone" id="stampa">Stampa / PDF</button>
+    <label class="bottone" for="importa">Riapri un file…</label>
+    <input type="file" id="importa" accept=".json,application/json" hidden>
+    <button type="button" class="bottone pericolo" id="azzera">Ricomincia da capo</button>
+  </div>
+
+  <div class="avviso">
+    <strong>Dove finiscono i dati.</strong> Questa pagina non manda niente a
+    nessuno da sola: tutto resta nel browser di chi compila finché non scarica
+    il file. Non scrivere qui password, dati di salute o dati personali di
+    altri: bastano il nome della schermata e cosa è successo.
+  </div>
+</main>
+
+<footer class="piede">
+  <div class="contenitore">
+    <p>YachtNav Manager — scheda di collaudo · <span id="versione-scheda"></span></p>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   Scheda di collaudo YachtNav Manager
+   Pagina statica, autonoma: nessuna dipendenza esterna, funziona offline.
+   Se un giorno vuoi la raccolta automatica, basta valorizzare RACCOLTA
+   con l'indirizzo di un endpoint che accetti un POST JSON.
+   ===================================================================== */
+const VERSIONE = '1.0 — settembre 2026';
+const RACCOLTA = ''; // es. 'https://effdipi.it/api/collaudo'
+const CHIAVE = 'yachtnav-collaudo-v1';
+
+/* --- La scheda del tester ------------------------------------------ */
+const ANAGRAFICA = [
+  { id:'nome',       et:'Nome (o come vuoi essere chiamato)', tipo:'text' },
+  { id:'ruolo',      et:'Che lavoro fai a bordo o a terra',   tipo:'text',
+    aiuto:'Comandante, ingegnere, hostess, gestore flotta, armatore, altro…' },
+  { id:'esperienza', et:'Anni di esperienza nel settore',     tipo:'select',
+    opzioni:['','Nessuna, sono qui per provare','Meno di 2','2–5','5–15','Più di 15'] },
+  { id:'barca',      et:'Su che tipo di barca lavori',        tipo:'text',
+    aiuto:'Lunghezza, privata o commerciale, quante persone di equipaggio' },
+  { id:'dispositivo',et:'Dispositivo usato per la prova',     tipo:'text',
+    aiuto:'Es. iPhone 14, iPad, portatile Windows, tutti e tre' },
+  { id:'browser',    et:'Browser',                            tipo:'text',
+    aiuto:'Safari, Chrome, Edge…' },
+  { id:'indirizzo',  et:'Indirizzo da cui hai provato',       tipo:'text' },
+  { id:'data',       et:'Data della prova',                   tipo:'date' },
+  { id:'durata',     et:'Quanto tempo ci hai dedicato',       tipo:'select',
+    opzioni:['','Meno di 30 minuti','Mezz’ora – 1 ora','1–3 ore','Più di 3 ore','A più riprese'] },
+  { id:'connessione',et:'Com’era la connessione',        tipo:'select',
+    opzioni:['','Buona per tutto il tempo','A tratti','Quasi assente','Ho provato anche in modalità aereo'] },
+];
+
+/* --- La batteria di prove ------------------------------------------ */
+const SEZIONI = [
+  { id:'accesso', titolo:'Accesso e sicurezza',
+    intro:'La prima porta. Se qui qualcosa non torna, non si va da nessuna parte.',
+    voci:[
+      { t:'Accedo con email e password corrette: entro e mi ritrovo sulla mia barca.' },
+      { t:'Sbaglio la password: il messaggio è chiaro e non rivela se quell’email esista o no.' },
+      { t:'Sbaglio la password molte volte di fila: dopo un po’ l’app mi blocca invece di lasciarmi provare all’infinito.',
+        h:'È una difesa contro chi tenta le password a raffica: dovrebbe scattare intorno al decimo tentativo.' },
+      { t:'Primo accesso con un utente appena creato: l’app mi obbliga a scegliere una password mia prima di farmi entrare.' },
+      { t:'Cambio password: se la conferma non coincide o la password è troppo corta, capisco subito cosa devo correggere.' },
+      { t:'Spunto «Ricordami su questo dispositivo», chiudo il browser e lo riapro: sono ancora dentro.' },
+      { t:'Esco e poi premo «indietro» del browser: non riesco a rivedere i dati della barca.' },
+      { t:'Incollo l’indirizzo di una pagina interna senza aver fatto l’accesso: finisco alla pagina di accesso.' },
+      { t:'Se ho modifiche non ancora sincronizzate e provo a uscire, l’app mi avverte prima di lasciarmi andare.' },
+    ]},
+
+  { id:'avvio', titolo:'Scelta della barca e primo giro',
+    intro:'Il momento in cui uno capisce se l’app è per lui o no.',
+    voci:[
+      { t:'Nell’elenco «I miei yacht» vedo solo le barche a cui ho davvero accesso.' },
+      { t:'Creo una barca nuova: ci mette poco e si apre già pronta all’uso.' },
+      { t:'Cambio barca dal selettore: cambiano davvero tutti i dati, senza residui della barca di prima.' },
+      { t:'Passo dalla «vista di bordo» alla «gestione» e viceversa: il pulsante fa quello che promette e la scelta resta anche dopo aver ricaricato.' },
+      { t:'Il menu mostra solo i moduli attivi su questa barca: niente voci che poi non funzionano.' },
+      { t:'Dopo cinque minuti so dire a cosa serve l’app senza che nessuno me lo spieghi.',
+        h:'Se la risposta è no, scrivi nelle note dove ti sei perso.' },
+    ]},
+
+  { id:'oggi', titolo:'Oggi — la vista di bordo',
+    intro:'La schermata del telefono, quella che si guarda con una mano sola mentre si cammina.',
+    voci:[
+      { t:'Apro «Oggi»: in cima c’è quello che serve adesso, non un cruscotto di numeri.' },
+      { t:'Con un allarme attivo compare in «Sta suonando» e ci arrivo con un tocco.' },
+      { t:'Un giro di ronda scaduto compare fra i «Giri da fare», con l’ora da cui è scaduto.' },
+      { t:'In «Tocca a te» vedo solo il lavoro assegnato a me, non quello di tutti.' },
+      { t:'«Oggi a bordo» mostra gli impegni della giornata, con «tutto il giorno» dove serve.' },
+      { t:'Quando non c’è niente in sospeso l’app lo dice con una frase chiara, invece di mostrare riquadri vuoti.' },
+      { t:'La scorciatoia «Scansiona QR» apre la fotocamera e riconosce l’etichetta di un apparato.' },
+      { t:'«Il tuo riposo» mi avverte che la giornata di oggi non è ancora compilata.' },
+    ]},
+
+  { id:'segna', titolo:'Segna e Note',
+    intro:'Annotare al volo mentre si ha in mano un cacciavite, e sistemare dopo con calma.',
+    voci:[
+      { t:'Il pulsante «Segna» si apre in un tocco: scrivo due parole e salvo senza dover scegliere categorie.' },
+      { t:'Segno qualcosa allegando una foto scattata sul momento.' },
+      { t:'Segno un importo scritto all’italiana, con la virgola (per esempio 312,50): resta 312,50 e non diventa altro.',
+        h:'Controlla il numero anche dopo aver riaperto la scheda.' },
+      { t:'La nota compare in «Note» fra quelle da smistare.' },
+      { t:'Trasformo una nota in intervento di manutenzione: l’intervento nasce e la nota resta collegata.' },
+      { t:'Trasformo una nota in spesa, una in articolo da comprare e una in richiesta d’acquisto.' },
+      { t:'«Vai a quello che è diventata» mi porta davvero sull’elemento giusto.' },
+      { t:'Archivio una nota senza seguito: sparisce da quelle aperte ma resta consultabile.' },
+      { t:'Elimino definitivamente una nota: mi viene chiesta conferma.' },
+    ]},
+
+  { id:'checklist', titolo:'Checklist e giri di ronda',
+    intro:'Le liste che si spuntano prima di partire e i giri periodici in sala macchine.',
+    voci:[
+      { t:'Trovo dei modelli standard già pronti, senza doverli creare io.' },
+      { t:'Creo un modello mio con più voci e lo riutilizzo.' },
+      { t:'Avvio un’esecuzione, spunto le voci una a una e l’avanzamento sale di conseguenza.' },
+      { t:'Su una voce con valore atteso inserisco una lettura fuori intervallo: l’app me lo segnala.' },
+      { t:'Un modello impostato come giro di ronda ogni N ore, passato il tempo, risulta «da rifare».' },
+      { t:'Completo l’esecuzione: risulta completata, con la data e chi l’ha fatta.' },
+      { t:'Elimino un’esecuzione: mi viene chiesta conferma.' },
+      { t:'Spunto le voci col telefono in una mano sola: prendo i bersagli al primo colpo, senza spuntare quello sbagliato.' },
+    ]},
+
+  { id:'manutenzioni', titolo:'Manutenzioni e apparati',
+    intro:'Il cuore del lavoro tecnico: interventi, contaore, etichette sugli apparati.',
+    voci:[
+      { t:'Creo un intervento con priorità, reparto, persona assegnata e scadenza.' },
+      { t:'Passo dalla lista alla bacheca e sposto un intervento da Aperto a In corso a Completato.' },
+      { t:'Un intervento ricorrente ogni N giorni, alla chiusura, ne genera automaticamente il prossimo.' },
+      { t:'Un intervento legato alle ore di un apparato scade quando il contaore le raggiunge.' },
+      { t:'Registro il contaore: accetta una lettura più alta e rifiuta con un messaggio chiaro una lettura più bassa dell’ultima.' },
+      { t:'Aggiungo un apparato (motore, generatore) con modello e numero di serie.' },
+      { t:'Stampo le etichette QR, ne attacco una e la inquadro col telefono: si apre la scheda giusta.' },
+      { t:'Dalla scheda dell’apparato segnalo un guasto in due parole: finisce fra le note, collegato a quell’apparato.' },
+      { t:'«Ultimi interventi» sull’apparato mostra davvero quelli che ho appena registrato.' },
+      { t:'Scrivo un costo con la virgola (per esempio 1.250,50): viene salvato per quello che è.' },
+    ]},
+
+  { id:'inventario', titolo:'Inventario e magazzino',
+    intro:'Ricambi, provviste, scorte minime. Qui gli errori si pagano in porto.',
+    voci:[
+      { t:'Creo un articolo con categoria, unità di misura, ubicazione e scorta minima.' },
+      { t:'Rettifico la giacenza in più e in meno: il totale torna sempre.' },
+      { t:'Porto un articolo sotto la scorta minima: compare fra quelli in esaurimento.' },
+      { t:'Filtro per categoria (ricambi, provviste, magazzino) e cerco per nome o codice ricambio.' },
+      { t:'Faccio una rettifica mentre sono senza rete e poi rientro in linea: la quantità viene contata una volta sola, non due.',
+        h:'È la prova più importante di questa sezione: controlla il numero finale, non solo che non ci siano errori.' },
+    ]},
+
+  { id:'acquisti', titolo:'Acquisti',
+    intro:'Si chiede, si approva, si ordina, si riceve. Ogni passaggio ha un nome e un responsabile.',
+    voci:[
+      { t:'Chiedo qualcosa indicando quantità, stima di costo ed entro quando serve.' },
+      { t:'Le richieste ancora da approvare stanno in cima all’elenco, non in fondo.' },
+      { t:'Approvo una richiesta; ne rifiuto un’altra scrivendo il motivo.' },
+      { t:'Ordino indicando fornitore e numero d’ordine.' },
+      { t:'Ricevo la merce: in un solo passaggio registro la spesa in contabilità e aggiorno la giacenza.' },
+      { t:'Se il costo effettivo è diverso dalla stima, la differenza si vede.' },
+      { t:'L’«impegno di spesa» mi dice quanti soldi sono promessi ma non ancora usciti.' },
+      { t:'Chi non ha il permesso di approvare non riesce ad approvare, nemmeno insistendo.' },
+    ]},
+
+  { id:'contabilita', titolo:'Contabilità',
+    intro:'Le spese della barca e i conti da presentare a chi paga.',
+    voci:[
+      { t:'Registro una spesa con importo scritto all’italiana (312,50) e resta quello.' },
+      { t:'Trovo la categoria giusta per quello che spendo davvero.',
+        h:'Se una categoria che ti serve manca, scrivi quale nelle note.' },
+      { t:'Il totale del periodo torna con la somma delle righe che vedo.' },
+      { t:'Filtro per periodo, categoria e fornitore.' },
+      { t:'Esporto e apro il file con Excel: le colonne sono separate come si deve e gli accenti sono giusti.',
+        h:'Guarda parole come «unità», «però», «città».' },
+    ]},
+
+  { id:'documenti', titolo:'Documenti',
+    intro:'Certificati di bandiera, assicurazioni, contratti: roba che scade e che va trovata subito.',
+    voci:[
+      { t:'Carico un PDF indicando categoria e data di scadenza.' },
+      { t:'Un documento vicino alla scadenza compare fra gli avvisi.' },
+      { t:'Riscarico il documento e lo apro: è integro, è lo stesso file.' },
+      { t:'Carico un file grosso: vedo che sta caricando e il limite è dichiarato prima, non dopo.' },
+      { t:'Cerco un documento per nome e lo trovo in pochi secondi.' },
+      { t:'Elimino un documento: mi viene chiesta conferma.' },
+    ]},
+
+  { id:'equipaggio', titolo:'Equipaggio e certificati',
+    intro:'Le persone a bordo, i loro brevetti e le loro scadenze.',
+    voci:[
+      { t:'Aggiungo un membro con ruolo di accesso, posizione di bordo e reparto.' },
+      { t:'Il nuovo membro riesce ad accedere e al primo accesso deve cambiare la password.' },
+      { t:'Reimposto la password di un membro dalla sua scheda.' },
+      { t:'Aggiungo un certificato (STCW, visita medica) con numero, rilascio e scadenza.' },
+      { t:'Creo un tipo di certificato mio (per esempio «Libretto di navigazione») con i giorni di preavviso che voglio io.' },
+      { t:'Un certificato in scadenza compare fra gli avvisi, col conto dei giorni che mancano.' },
+      { t:'Cambio il ruolo di una persona: quello che può fare cambia subito.' },
+      { t:'I reparti (coperta, macchina, interni, cucina) rispecchiano come è organizzata una barca vera.' },
+    ]},
+
+  { id:'riposo', titolo:'Ore di riposo (MLC)',
+    intro:'Il registro obbligatorio, quello che guarda l’ispettore. Deve essere veloce da compilare e difficile da sbagliare.',
+    voci:[
+      { t:'Annerisco col dito le mezz’ore di lavoro: il tratto segue il dito senza saltare caselle.' },
+      { t:'Il totale delle ore di riposo del periodo si aggiorna mentre compilo.' },
+      { t:'Costruisco una giornata non conforme: viene segnalata e posso scrivere il motivo della deroga.' },
+      { t:'Confermo la mia giornata: risulta confermata e resta traccia di chi l’ha firmata.' },
+      { t:'Mi sposto alla settimana precedente e a quella successiva: i dati sono quelli giusti.' },
+      { t:'Il comandante può scegliere di chi vedere il registro; un membro vede soltanto il proprio.' },
+      { t:'Il riferimento normativo (MLC 2006 A2.3, STCW) è presente e comprensibile.' },
+      { t:'Confrontato con il modulo cartaceo che usi oggi: è più veloce o più lento?',
+        h:'Rispondi nelle note qui sotto, con onestà.' },
+    ]},
+
+  { id:'ore', titolo:'Ore lavorate e assenze',
+    intro:'La parte amministrativa: ferie, malattia, permessi, il prospetto per pagare le persone.',
+    voci:[
+      { t:'Registro le ore lavorate di una giornata.' },
+      { t:'Registro le ferie di più persone su un intervallo di date, saltando sabato e domenica.' },
+      { t:'Prima di scrivere vedo l’anteprima: quante ore, a chi, per quali giorni.' },
+      { t:'Registro una malattia: l’app mi ricorda di non scrivere la diagnosi.' },
+      { t:'Il prospetto dell’anno torna con quello che ho registrato.' },
+      { t:'Esporto il periodo e il file è utilizzabile da chi fa le buste paga.' },
+    ]},
+
+  { id:'calendario', titolo:'Calendario',
+    intro:'Charter, trasferimenti, cantiere, cambi equipaggio, visite.',
+    voci:[
+      { t:'Creo un impegno con tipo, inizio, fine, luogo e responsabile.' },
+      { t:'Le scadenze che vengono da documenti, certificati e interventi compaiono col bordo tratteggiato e non si modificano da qui.' },
+      { t:'Cambio mese avanti e indietro senza confondermi su dove sono.' },
+      { t:'Tocco un giorno pieno e vedo tutto quello che contiene.' },
+      { t:'Sul telefono il calendario resta leggibile e non richiede di scorrere di lato.' },
+    ]},
+
+  { id:'navigazione', titolo:'Navigazione e meteo',
+    intro:'Viaggi, punti di interesse, pianificazione e previsioni. Attenzione a cosa è dichiarato e cosa no.',
+    voci:[
+      { t:'Creo un viaggio con più punti: la distanza in miglia è credibile.' },
+      { t:'Pianifico da un porto a un altro con uno scalo: ottengo distanza, durata alla velocità scelta e orario di arrivo previsto.' },
+      { t:'È dichiarato chiaramente che la rotta mostrata è la congiungente più breve e non evita la costa.',
+        h:'Questo punto è delicato: se il messaggio non è evidente, dillo.' },
+      { t:'Aggiungo un punto di interesse toccando la mappa (marina, ancoraggio, rifornimento).' },
+      { t:'«Dove sono» sposta la mappa sulla mia posizione, oppure spiega perché non può.' },
+      { t:'Il meteo mostra vento in nodi, raffiche, onda e pressione, con l’ora di aggiornamento.' },
+      { t:'In una località interna il moto ondoso manca: l’app lo dichiara invece di mostrare zero.' },
+      { t:'La mappa si sposta e si ingrandisce col dito in modo fluido, anche con connessione lenta.' },
+      { t:'È scritto che i dati meteo non sostituiscono i bollettini ufficiali.' },
+      { t:'Cerco un porto per nome e lo trovo.' },
+    ]},
+
+  { id:'galleria', titolo:'Galleria e planimetrie',
+    intro:'Foto dei danni, lavori fatti, piani di coperta.',
+    voci:[
+      { t:'Carico una foto e un filmato indicando la categoria.' },
+      { t:'Provo a caricare un file troppo grande: il messaggio dice qual è il limite.' },
+      { t:'Scarico un file caricato da un altro dispositivo.' },
+      { t:'Ingrandisco una planimetria: resta leggibile.' },
+      { t:'Le foto scattate col telefono si caricano senza attese assurde.' },
+    ]},
+
+  { id:'allarmi', titolo:'Allarmi e notifiche',
+    intro:'Quello che deve arrivare anche quando l’app è chiusa.',
+    voci:[
+      { t:'Creo un allarme manuale scegliendo la gravità.' },
+      { t:'Prendo in carico un allarme e poi lo risolvo: gli stati cambiano e resta traccia di chi ha fatto cosa.' },
+      { t:'Un documento scaduto genera l’allarme; una volta risolto non ricompare identico il giorno dopo.' },
+      { t:'Attivo le notifiche su questo dispositivo e ricevo la notifica di prova.' },
+      { t:'Su iPhone: se l’app non è installata, il messaggio spiega che va prima aggiunta alla schermata iniziale.' },
+      { t:'Con l’app chiusa arriva comunque la notifica di un allarme critico.' },
+      { t:'Gli allarmi che vedo sono quelli che vorrei davvero vedere: non troppi, non troppo pochi.',
+        h:'Un allarme che suona sempre smette di essere un allarme. Dicci se è rumoroso.' },
+    ]},
+
+  { id:'report', titolo:'Report',
+    intro:'Non quanti, ma come sta andando. È la pagina che l’armatore guarderà per primo.',
+    voci:[
+      { t:'Scelgo il periodo e tutti i numeri cambiano di conseguenza.' },
+      { t:'Ogni sezione mi dice qualcosa di utile, non solo dei conteggi.' },
+      { t:'Esporto in CSV e lo apro con Excel: colonne separate, accenti giusti, niente stranezze.' },
+      { t:'Se non ho accesso a nessuna sezione l’app me lo dice invece di mostrare una pagina vuota.' },
+      { t:'Le barre dei grafici partono da zero, senza esagerare le differenze.' },
+      { t:'Stamperesti questa pagina e la daresti all’armatore così com’è?',
+        h:'Se no, cosa manca o cosa toglieresti?' },
+    ]},
+
+  { id:'flotta', titolo:'Flotta e clienti',
+    intro:'Per chi segue più barche, e per chi le fattura.',
+    voci:[
+      { t:'In Flotta le barche che chiedono attenzione stanno in cima.' },
+      { t:'Tocco un segnale (allarmi, interventi scaduti, scorte) e arrivo nel punto giusto di quella barca.' },
+      { t:'Una barca che non risponde è dichiarata tale, senza far finta che i suoi numeri siano zero.' },
+      { t:'Creo un cliente con ragione sociale e partita IVA e gli assegno una barca.' },
+      { t:'Aggiungo una persona che amministra il cliente: vede tutte le sue barche.' },
+      { t:'Sospendo un cliente e i suoi accessi si fermano davvero.' },
+    ]},
+
+  { id:'permessi', titolo:'Permessi e moduli',
+    intro:'Chi può fare cosa. Qui vale la pena provare a fare il furbo.',
+    voci:[
+      { t:'Cambio un permesso per ruolo e la persona interessata se ne accorge subito.' },
+      { t:'Un’eccezione impostata sulla singola persona vince sul suo ruolo.' },
+      { t:'Riporto una casella al valore predefinito del ruolo (Alt+clic) e capisco che è tornata al valore di partenza.' },
+      { t:'Tolgo un permesso e poi provo comunque a fare quell’azione, ricaricando e andando all’indirizzo diretto: non ci riesco.',
+        h:'Prova sul serio a scavalcare il divieto: è il modo giusto di collaudare questa parte.' },
+      { t:'Un modulo non attivo su questa barca non compare nel menu e non si apre nemmeno scrivendo l’indirizzo a mano.' },
+      { t:'Chi entra come armatore o ospite vede il suo portale e non l’amministrazione della barca.' },
+    ]},
+
+  { id:'armatore', titolo:'Portale armatore e ospiti',
+    intro:'Un prodotto a sé, con un tono diverso: qui non si parla di manutenzioni.',
+    voci:[
+      { t:'Entro come armatore: il tono è diverso, senza gergo tecnico.' },
+      { t:'Vedo la traversata con le miglia e i punti di rotta.' },
+      { t:'Vedo il programma della giornata e il menu.' },
+      { t:'Vedo le foto scelte per me.' },
+      { t:'Quando non c’è ancora niente, la pagina lo dice con garbo invece di sembrare rotta.' },
+      { t:'Mostreresti questa pagina a un armatore vero?' },
+    ]},
+
+  { id:'impostazioni', titolo:'Impostazioni, lingua e aspetto',
+    intro:'Personalizzazione e traduzioni.',
+    voci:[
+      { t:'Passo all’inglese: è tradotto tutto, senza sigle strane al posto delle frasi.',
+        h:'Guarda soprattutto i testi con dei numeri dentro, tipo «3 modifiche da sincronizzare».' },
+      { t:'Torno in italiano: date, orari e numeri sono nel formato italiano.' },
+      { t:'Provo tema chiaro, scuro e «sistema»: si legge bene in tutti e tre.' },
+      { t:'Cambio la palette dei colori e poi la ripristino.' },
+      { t:'Aggiungo una posizione di bordo che manca nell’elenco.' },
+      { t:'Vedo qual è il mio abbonamento e quali moduli sono attivi.' },
+    ]},
+
+  { id:'offline', titolo:'Senza rete e sincronizzazione',
+    intro:'La prova che conta di più: in mare la connessione non c’è. Metti il dispositivo in modalità aereo e continua a lavorare.',
+    voci:[
+      { t:'In modalità aereo l’app si apre lo stesso e mostra i dati che avevo già visto.' },
+      { t:'Senza rete creo un intervento, spunto una checklist e rettifico una giacenza: tutto viene accettato.' },
+      { t:'Vedo con chiarezza quante modifiche sono in attesa di essere inviate.' },
+      { t:'Torno in rete: le modifiche partono da sole e il contatore torna a zero, senza che io debba fare niente.' },
+      { t:'Modifico senza rete qualcosa che nel frattempo è cambiato da un altro dispositivo: l’app me lo dice e mi lascia scegliere quale versione tenere.' },
+      { t:'Un’operazione non riuscita si può ritentare oppure scartare.' },
+      { t:'Esporto il backup delle modifiche in attesa dalle Impostazioni.' },
+      { t:'Nessuna schermata resta piantata su «Caricamento…» quando la rete manca.' },
+      { t:'Chiudo del tutto l’app senza rete e la riapro: quello che avevo scritto è ancora lì.' },
+    ]},
+
+  { id:'bordo', titolo:'Uso vero a bordo',
+    intro:'Mani bagnate, sole in faccia, barca che si muove, una mano occupata.',
+    voci:[
+      { t:'Uso l’app in piedi con una mano sola: i comandi principali si raggiungono col pollice.' },
+      { t:'Con le dita bagnate o con i guanti prendo i bersagli al primo colpo.' },
+      { t:'Al sole, con la luminosità al massimo, i testi si leggono.' },
+      { t:'Nessuna pagina mi costringe a scorrere di lato sul telefono.' },
+      { t:'Girando il telefono in orizzontale non si rompe niente.' },
+      { t:'Su tablet lo spazio è usato bene: non sembra un telefono ingrandito.' },
+      { t:'Riesco a fare quello che mi serve senza togliermi gli occhiali da sole o avvicinare troppo lo schermo.' },
+    ]},
+
+  { id:'robustezza', titolo:'Velocità e robustezza',
+    intro:'Come si comporta quando le cose vanno storte.',
+    voci:[
+      { t:'Da chiusa, l’app si apre in pochi secondi.' },
+      { t:'Una lista lunga scorre senza scatti.' },
+      { t:'Ricarico la pagina a metà di un modulo compilato: non perdo tutto senza un avviso.' },
+      { t:'Se una parte della pagina non si carica, il resto continua a funzionare e posso riprovare.' },
+      { t:'Passo dal wifi ai dati mobili: l’app si riprende da sola.' },
+      { t:'Quando esce un aggiornamento l’avviso arriva, le novità sono spiegate e ricaricando non perdo nulla.' },
+      { t:'Non ho mai visto una schermata bianca o un errore in inglese.' },
+    ]},
+
+  { id:'fiducia', titolo:'Guida, dati e fiducia',
+    intro:'L’ultima domanda è la più importante: ci metteresti sopra i dati veri della tua barca?',
+    voci:[
+      { t:'La Guida si apre e risponde a una domanda che mi sono posto davvero durante la prova.' },
+      { t:'Elimino una barca di prova: l’app mi fa riscrivere il nome e mi spiega cosa sparisce per sempre.' },
+      { t:'Capisco dove finiscono i miei dati e per quanto tempo restano.' },
+      { t:'Non ho mai incontrato messaggi in gergo tecnico o in inglese.' },
+      { t:'Mi fiderei a tenerci sopra i dati veri della barca.' },
+      { t:'Lo userei domani mattina al posto di quello che uso oggi.' },
+    ]},
+];
+
+/* --- Le note libere ------------------------------------------------ */
+const LIBERE = [
+  { id:'problemi_liberi', et:'Problemi e cose che non funzionano',
+    aiuto:'Qui in libertà. Sopra c’è anche il modulo per descriverne uno alla volta con i passi per rifarlo.',
+    ph:'Es. «Se salvo una spesa mentre sono senza rete e poi riapro, l’importo cambia»…' },
+  { id:'migliorie', et:'Migliorie — cose che ci sono ma andrebbero fatte meglio',
+    aiuto:'Non serve dire come si fa: basta dire cosa ti ha dato fastidio e perché.',
+    ph:'Es. «Per registrare il contaore servono troppi tocchi: lo faccio venti volte al giorno»…' },
+  { id:'idee', et:'Idee nuove — cose che mancano del tutto',
+    aiuto:'Anche quelle che sembrano impossibili. Meglio saperle.',
+    ph:'Es. «Vorrei un registro del carburante con i consumi per motore»…' },
+  { id:'confusione', et:'Dove mi sono perso',
+    aiuto:'I punti in cui hai dovuto pensarci su, tornare indietro o indovinare. Sono i più preziosi.',
+    ph:'Es. «Non capivo la differenza fra ore di riposo e ore lavorate»…' },
+  { id:'parole', et:'Parole sbagliate, testi poco chiari, refusi',
+    aiuto:'Nomi che a bordo non si usano così, traduzioni inglesi storte, frasi ambigue.',
+    ph:'Es. «Gli ormeggi li chiamate diritti portuali, io cerco "ormeggio"»…' },
+  { id:'oggi_come', et:'Come fai oggi questo lavoro',
+    aiuto:'Carta, Excel, WhatsApp, un altro programma? Cosa funziona già bene e non va toccato?',
+    ph:'' },
+  { id:'togliere', et:'Cosa toglieresti',
+    aiuto:'Roba che non useresti mai e che intasa lo schermo.',
+    ph:'' },
+  { id:'mancante', et:'La cosa che ti impedirebbe di adottarlo',
+    aiuto:'Se ce n’è una sola che blocca tutto, quale sarebbe?',
+    ph:'' },
+  { id:'libero', et:'Qualsiasi altra cosa',
+    aiuto:'Anche a ruota libera.',
+    ph:'' },
+];
+
+/* --- I voti -------------------------------------------------------- */
+const VOTI = [
+  { id:'chiarezza', et:'Si capisce senza spiegazioni' },
+  { id:'velocita',  et:'È veloce da usare' },
+  { id:'bordo',     et:'Funziona davvero a bordo (mani, sole, movimento)' },
+  { id:'offline',   et:'Regge senza connessione' },
+  { id:'aspetto',   et:'È bello da vedere' },
+  { id:'fiducia',   et:'Mi ci fiderei con i dati veri' },
+  { id:'utile',     et:'Mi farebbe risparmiare tempo' },
+];
+
+const FINALI = [
+  { id:'uso_quotidiano', et:'Lo useresti tutti i giorni?', tipo:'select',
+    opzioni:['','Sì, così com’è','Sì, ma con qualche correzione','Forse, dipende','No, e ti spiego perché sotto'] },
+  { id:'consiglio', et:'Lo consiglieresti a un collega?', tipo:'select',
+    opzioni:['','Sicuramente','Probabilmente','Non so','Probabilmente no','No'] },
+  { id:'prezzo', et:'Quanto ti sembrerebbe onesto pagarlo al mese, per barca?', tipo:'text',
+    aiuto:'Una cifra a sensazione, senza impegno. Serve solo a capire l’ordine di grandezza.' },
+  { id:'moduli_utili', et:'Quali due o tre parti valgono da sole il prezzo?', tipo:'text' },
+];
+</script>
+<script>
+/* ===================== Stato e salvataggio ========================= */
+const vuoto = () => ({
+  versione: VERSIONE, salvataAl: null,
+  anagrafica:{}, esiti:{}, note:{}, problemi:[], libere:{}, voti:{}, finali:{}
+});
+let stato = vuoto();
+
+function carica(){
+  try{
+    const grezzo = localStorage.getItem(CHIAVE);
+    if(!grezzo) return;
+    const letto = JSON.parse(grezzo);
+    stato = Object.assign(vuoto(), letto);
+  }catch(e){ /* archivio non disponibile o corrotto: si riparte puliti */ }
+}
+carica();
+
+let attesaSalvataggio = null;
+function salva(silenzioso){
+  stato.salvataAl = new Date().toISOString();
+  try{
+    localStorage.setItem(CHIAVE, JSON.stringify(stato));
+    if(!silenzioso) segnala('Salvato sul dispositivo alle ' + new Date().toLocaleTimeString('it-IT'));
+  }catch(e){
+    segnala('Attenzione: il browser non riesce a salvare (finestra anonima?). Scarica il file per non perdere niente.');
+  }
+}
+function salvaPresto(){
+  clearTimeout(attesaSalvataggio);
+  attesaSalvataggio = setTimeout(() => salva(false), 600);
+}
+function segnala(testo){ document.getElementById('stato-salvataggio').textContent = testo; }
+
+/* ===================== Costruzione della pagina ==================== */
+const ESITI = [
+  { v:'ok',     et:'Funziona' },
+  { v:'ko',     et:'Non funziona' },
+  { v:'dubbio', et:'Così così' },
+  { v:'na',     et:'Non provato' },
+];
+
+function el(tag, attributi, figli){
+  const n = document.createElement(tag);
+  if(attributi) for(const k in attributi){
+    if(k === 'class') n.className = attributi[k];
+    else if(k === 'testo') n.textContent = attributi[k];
+    else if(k === 'html') n.innerHTML = attributi[k];
+    else if(attributi[k] !== undefined && attributi[k] !== null) n.setAttribute(k, attributi[k]);
+  }
+  (figli || []).forEach(f => n.appendChild(f));
+  return n;
+}
+
+function campoLibero(def, contenitore, deposito){
+  const c = el('div', { class:'campo' });
+  const idCampo = 'c-' + def.id;
+  c.appendChild(el('label', { for:idCampo, testo:def.et }));
+  if(def.aiuto) c.appendChild(el('span', { class:'aiuto', testo:def.aiuto }));
+  let controllo;
+  if(def.tipo === 'select'){
+    controllo = el('select', { id:idCampo });
+    def.opzioni.forEach(o => {
+      const op = el('option', { value:o, testo:o || '—' });
+      controllo.appendChild(op);
+    });
+  } else if(def.tipo === 'text' || def.tipo === 'date'){
+    controllo = el('input', { type:def.tipo, id:idCampo });
+  } else {
+    controllo = el('textarea', { id:idCampo, placeholder:def.ph || '', rows:'4' });
+  }
+  controllo.value = deposito[def.id] || '';
+  controllo.addEventListener('input', () => { deposito[def.id] = controllo.value; salvaPresto(); });
+  controllo.addEventListener('change', () => { deposito[def.id] = controllo.value; salvaPresto(); });
+  c.appendChild(controllo);
+  contenitore.appendChild(c);
+}
+
+function scheda(numero, titolo, introduzione, id){
+  const s = el('section', { class:'scheda', id:'s-' + id });
+  const capo = el('button', { class:'capo', type:'button', 'aria-expanded':'true' }, [
+    el('span', { class:'num', testo:numero }),
+    el('h2', { testo:titolo }),
+    el('span', { class:'conteggio' }),
+    el('span', { class:'freccia', testo:'▾' }),
+  ]);
+  const corpo = el('div', { class:'corpo' });
+  if(introduzione) corpo.appendChild(el('p', { class:'introduzione', testo:introduzione }));
+  capo.addEventListener('click', () => {
+    const chiusa = s.getAttribute('data-chiusa') === '1';
+    s.setAttribute('data-chiusa', chiusa ? '0' : '1');
+    capo.setAttribute('aria-expanded', chiusa ? 'true' : 'false');
+  });
+  s.appendChild(capo); s.appendChild(corpo);
+  return { s, corpo, conteggio: capo.querySelector('.conteggio') };
+}
+
+const contenitoreSezioni = document.getElementById('sezioni');
+const indice = document.getElementById('indice');
+let numeroScheda = 0;
+
+/* --- 1. Chi sei --- */
+{
+  numeroScheda++;
+  const { s, corpo } = scheda(numeroScheda, 'Chi sei e come hai provato', 'Serve a leggere le tue risposte nel contesto giusto. Il nome puoi anche non metterlo.', 'chi');
+  const g = el('div', { class:'griglia' });
+  ANAGRAFICA.forEach(d => campoLibero(d, g, stato.anagrafica));
+  corpo.appendChild(g);
+  contenitoreSezioni.appendChild(s);
+  indice.appendChild(el('a', { href:'#s-chi', testo:'Chi sei' }));
+}
+
+/* --- 2..n. Le prove --- */
+const registroSezioni = [];
+SEZIONI.forEach(sez => {
+  numeroScheda++;
+  const { s, corpo, conteggio } = scheda(numeroScheda, sez.titolo, sez.intro, sez.id);
+  sez.voci.forEach((voce, i) => {
+    const idVoce = sez.id + '-' + (i + 1);
+    const v = el('div', { class:'voce', 'data-voce':idVoce });
+    v.appendChild(el('span', { class:'testo', html:
+      '<span class="indice">' + (i + 1) + '.</span>' + fuga(voce.t) +
+      (voce.h ? '<span class="suggerimento">' + fuga(voce.h) + '</span>' : '') }));
+    const gruppo = el('div', { class:'esiti', role:'radiogroup', 'aria-label':voce.t });
+    ESITI.forEach(e => {
+      const lab = el('label', { class:'e-' + e.v });
+      const inp = el('input', { type:'radio', name:idVoce, value:e.v });
+      if(stato.esiti[idVoce] === e.v) inp.checked = true;
+      inp.addEventListener('change', () => {
+        stato.esiti[idVoce] = e.v;
+        v.setAttribute('data-esito', e.v);
+        aggiornaTotali(); salvaPresto();
+      });
+      lab.appendChild(inp); lab.appendChild(el('span', { testo:e.et }));
+      gruppo.appendChild(lab);
+    });
+    v.appendChild(gruppo);
+    const nota = el('textarea', { class:'nota', rows:'1', placeholder:'nota, se c’è qualcosa da dire…' });
+    nota.value = stato.note[idVoce] || '';
+    nota.addEventListener('input', () => {
+      stato.note[idVoce] = nota.value;
+      nota.style.height = 'auto'; nota.style.height = (nota.scrollHeight + 2) + 'px';
+      salvaPresto();
+    });
+    v.appendChild(nota);
+    if(stato.esiti[idVoce]) v.setAttribute('data-esito', stato.esiti[idVoce]);
+    corpo.appendChild(v);
+  });
+  contenitoreSezioni.appendChild(s);
+  indice.appendChild(el('a', { href:'#s-' + sez.id, testo:sez.titolo }));
+  registroSezioni.push({ sez, s, conteggio });
+});
+
+function fuga(t){
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* --- Problemi, uno per scheda --- */
+const GRAVITA = ['','Bloccante — non si può lavorare','Grave — si lavora male','Fastidioso','Estetico'];
+let contenitoreProblemi;
+{
+  numeroScheda++;
+  const { s, corpo } = scheda(numeroScheda, 'Problemi trovati, uno per uno',
+    'Per ogni cosa che non ha funzionato: se riesci a dire come rifarla, la sistemiamo molto più in fretta.', 'problemi');
+  contenitoreProblemi = el('div');
+  corpo.appendChild(contenitoreProblemi);
+  const piu = el('button', { class:'bottone', type:'button', testo:'+ Aggiungi un problema' });
+  piu.addEventListener('click', () => { stato.problemi.push({}); disegnaProblemi(); salvaPresto(); });
+  corpo.appendChild(piu);
+  contenitoreSezioni.appendChild(s);
+  indice.appendChild(el('a', { href:'#s-problemi', testo:'Problemi' }));
+}
+
+const CAMPI_PROBLEMA = [
+  { id:'titolo',  et:'In una riga, cosa succede', tipo:'text' },
+  { id:'dove',    et:'Dove (schermata, pulsante)', tipo:'text' },
+  { id:'passi',   et:'Come si rifà', ph:'1. Apro… 2. Tocco… 3. Succede…' },
+  { id:'atteso',  et:'Cosa ti aspettavi', tipo:'text' },
+  { id:'ottenuto',et:'Cosa è successo invece', tipo:'text' },
+];
+
+function disegnaProblemi(){
+  contenitoreProblemi.innerHTML = '';
+  if(!stato.problemi.length){
+    contenitoreProblemi.appendChild(el('p', { class:'introduzione',
+      testo:'Nessun problema segnalato. Se ne trovi uno, aggiungilo qui sotto.' }));
+  }
+  stato.problemi.forEach((p, i) => {
+    const box = el('div', { class:'problema' });
+    const riga = el('div', { class:'riga1' }, [
+      el('span', { class:'etichetta', testo:'Problema ' + (i + 1) }),
+    ]);
+    const sel = el('select', { style:'max-width:260px', 'aria-label':'Gravità' });
+    GRAVITA.forEach(g => sel.appendChild(el('option', { value:g, testo:g || 'Gravità…' })));
+    sel.value = p.gravita || '';
+    sel.addEventListener('change', () => { p.gravita = sel.value; salvaPresto(); });
+    riga.appendChild(sel);
+    const via = el('button', { class:'bottone piccolo pericolo', type:'button', testo:'Togli' });
+    via.addEventListener('click', () => { stato.problemi.splice(i,1); disegnaProblemi(); salvaPresto(); });
+    riga.appendChild(via);
+    box.appendChild(riga);
+    CAMPI_PROBLEMA.forEach(def => {
+      const c = el('div', { class:'campo' });
+      c.appendChild(el('span', { class:'didascalia', testo:def.et }));
+      const controllo = def.tipo === 'text'
+        ? el('input', { type:'text' })
+        : el('textarea', { rows:'3', placeholder:def.ph || '' });
+      controllo.value = p[def.id] || '';
+      controllo.addEventListener('input', () => { p[def.id] = controllo.value; salvaPresto(); });
+      c.appendChild(controllo);
+      box.appendChild(c);
+    });
+    contenitoreProblemi.appendChild(box);
+  });
+}
+disegnaProblemi();
+
+/* --- Note libere --- */
+{
+  numeroScheda++;
+  const { s, corpo } = scheda(numeroScheda, 'Migliorie, idee e note libere',
+    'La parte che serve di più. Scrivi come parli: non deve essere una relazione.', 'note');
+  LIBERE.forEach(d => campoLibero(d, corpo, stato.libere));
+  contenitoreSezioni.appendChild(s);
+  indice.appendChild(el('a', { href:'#s-note', testo:'Migliorie e idee' }));
+}
+
+/* --- Voti e domande finali --- */
+{
+  numeroScheda++;
+  const { s, corpo } = scheda(numeroScheda, 'Il giudizio in breve',
+    'Da 1 (per niente) a 5 (moltissimo).', 'voti');
+  VOTI.forEach(v => {
+    const riga = el('div', { class:'voto' });
+    riga.appendChild(el('span', { class:'nome', testo:v.et }));
+    const stelle = el('div', { class:'stelle', role:'radiogroup', 'aria-label':v.et });
+    for(let n = 1; n <= 5; n++){
+      const lab = el('label', { title:n + ' su 5' });
+      const inp = el('input', { type:'radio', name:'voto-' + v.id, value:String(n) });
+      if(String(stato.voti[v.id]) === String(n)) inp.checked = true;
+      inp.addEventListener('change', () => { stato.voti[v.id] = n; accendi(stelle, n); salvaPresto(); });
+      lab.appendChild(inp);
+      lab.appendChild(document.createTextNode('★'));
+      stelle.appendChild(lab);
+    }
+    accendi(stelle, stato.voti[v.id] || 0);
+    riga.appendChild(stelle);
+    corpo.appendChild(riga);
+  });
+  corpo.appendChild(el('div', { style:'height:.8rem' }));
+  FINALI.forEach(d => campoLibero(d, corpo, stato.finali));
+  contenitoreSezioni.appendChild(s);
+  indice.appendChild(el('a', { href:'#s-voti', testo:'Giudizio' }));
+}
+
+function accendi(gruppo, n){
+  Array.from(gruppo.querySelectorAll('label')).forEach((l, i) => {
+    l.classList.toggle('accesa', i < n);
+  });
+}
+
+/* ===================== Totali e filtri ============================= */
+const tacca = document.getElementById('tacca');
+const etichettaAvanzamento = document.getElementById('etichetta-avanzamento');
+const riepilogoEsiti = document.getElementById('riepilogo-esiti');
+
+function tutteLeVoci(){
+  return SEZIONI.reduce((n, s) => n + s.voci.length, 0);
+}
+
+function aggiornaTotali(){
+  const totale = tutteLeVoci();
+  let fatte = 0, ok = 0, ko = 0, dubbio = 0;
+  SEZIONI.forEach(sez => sez.voci.forEach((_, i) => {
+    const e = stato.esiti[sez.id + '-' + (i + 1)];
+    if(e){ fatte++; if(e === 'ok') ok++; else if(e === 'ko') ko++; else if(e === 'dubbio') dubbio++; }
+  }));
+  tacca.style.width = totale ? (fatte / totale * 100).toFixed(1) + '%' : '0';
+  etichettaAvanzamento.textContent = fatte + ' su ' + totale + ' prove compilate';
+  riepilogoEsiti.textContent = fatte
+    ? ok + ' ok · ' + ko + ' no · ' + dubbio + ' così così'
+    : '';
+  registroSezioni.forEach(r => {
+    let f = 0, problemi = 0;
+    r.sez.voci.forEach((_, i) => {
+      const e = stato.esiti[r.sez.id + '-' + (i + 1)];
+      if(e) f++;
+      if(e === 'ko' || e === 'dubbio') problemi++;
+    });
+    r.conteggio.textContent = f + '/' + r.sez.voci.length + (problemi ? ' · ' + problemi + ' da guardare' : '');
+  });
+}
+
+let filtroCorrente = 'tutte';
+document.querySelectorAll('.filtri [data-filtro]').forEach(b => {
+  b.addEventListener('click', () => {
+    filtroCorrente = b.getAttribute('data-filtro');
+    document.querySelectorAll('.filtri [data-filtro]').forEach(x =>
+      x.setAttribute('aria-pressed', String(x === b)));
+    applicaFiltro();
+  });
+});
+
+function applicaFiltro(){
+  document.querySelectorAll('.voce').forEach(v => {
+    const e = stato.esiti[v.getAttribute('data-voce')];
+    let visibile = true;
+    if(filtroCorrente === 'dafare') visibile = !e;
+    if(filtroCorrente === 'problemi') visibile = (e === 'ko' || e === 'dubbio');
+    v.classList.toggle('nascosta', !visibile);
+  });
+  registroSezioni.forEach(r => {
+    const visibili = r.s.querySelectorAll('.voce:not(.nascosta)').length;
+    r.s.style.display = (filtroCorrente !== 'tutte' && visibili === 0) ? 'none' : '';
+    if(filtroCorrente !== 'tutte') r.s.setAttribute('data-chiusa', '0');
+  });
+}
+
+document.getElementById('comprimi').addEventListener('click', () => {
+  const schede = document.querySelectorAll('section.scheda');
+  const qualcunaAperta = Array.from(schede).some(s => s.getAttribute('data-chiusa') !== '1');
+  schede.forEach(s => {
+    s.setAttribute('data-chiusa', qualcunaAperta ? '1' : '0');
+    s.querySelector('.capo').setAttribute('aria-expanded', qualcunaAperta ? 'false' : 'true');
+  });
+  document.getElementById('comprimi').textContent = qualcunaAperta ? 'Apri tutto' : 'Comprimi tutto';
+});
+
+/* ===================== Uscita: file, testo, email ================== */
+function nomeFile(estensione){
+  const chi = (stato.anagrafica.nome || 'tester').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'tester';
+  const giorno = new Date().toISOString().slice(0,10);
+  return 'collaudo-yachtnav-' + chi + '-' + giorno + '.' + estensione;
+}
+
+/* Dentro un riquadro di anteprima (l'allegato aperto al volo, una pagina
+   incorniciata) il browser blocca scaricamento, stampa e mailto SENZA DIRLO:
+   il tasto sembra rotto e invece è il contorno che non lo lascia lavorare.
+   Meglio accorgersene e dirlo, con un ripiego che funziona ovunque. */
+function contestoLimitato(){
+  const motivi = [];
+  let inCornice = false;
+  try{ inCornice = window.self !== window.top; }catch(e){ inCornice = true; }
+  if(inCornice) motivi.push('la pagina è aperta dentro un riquadro di anteprima');
+  try{
+    localStorage.setItem('__prova','1'); localStorage.removeItem('__prova');
+  }catch(e){
+    motivi.push('il browser qui non permette di salvare nulla sul dispositivo');
+  }
+  return motivi;
+}
+const LIMITI = contestoLimitato();
+
+function scaricaBlob(contenuto, nome, tipo){
+  try{
+    const blob = new Blob([contenuto], { type:tipo });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = nome; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    return true;
+  }catch(e){ return false; }
+}
+
+/* Quando il file non può uscire, il contenuto si mostra: da un'area di testo
+   si copia a mano e si incolla in un messaggio. Funziona anche nei riquadri. */
+function mostraRipiego(contenuto, nome){
+  let riquadro = document.getElementById('ripiego');
+  if(!riquadro){
+    riquadro = el('div', { class:'avviso', id:'ripiego', style:'margin-bottom:1rem' });
+    document.querySelector('.azioni').insertAdjacentElement('afterend', riquadro);
+  }
+  riquadro.innerHTML = '';
+  riquadro.appendChild(el('p', { style:'margin:0 0 .5rem', html:
+    '<strong>Il salvataggio del file qui non è permesso.</strong> Il contenuto di ' +
+    '<code>' + fuga(nome) + '</code> è qui sotto: selezionalo tutto, copialo e ' +
+    'incollalo in una email o in un messaggio. Oppure riapri questa pagina in ' +
+    'una scheda normale del browser e riprova.' }));
+  const area = el('textarea', { rows:'8', readonly:'readonly',
+    style:'font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem' });
+  area.value = contenuto;
+  riquadro.appendChild(area);
+  const seleziona = el('button', { class:'bottone', type:'button',
+    style:'margin-top:.6rem', testo:'Seleziona tutto' });
+  seleziona.addEventListener('click', () => { area.focus(); area.select(); });
+  riquadro.appendChild(seleziona);
+  riquadro.scrollIntoView({ block:'nearest' });
+}
+
+function etichettaEsito(v){
+  const trovato = ESITI.find(e => e.v === v);
+  return trovato ? trovato.et : 'non compilata';
+}
+
+function riepilogoTesto(){
+  const r = [];
+  r.push('COLLAUDO YACHTNAV MANAGER');
+  r.push('Scheda ' + VERSIONE);
+  r.push('Scaricata il ' + new Date().toLocaleString('it-IT'));
+  r.push('');
+  r.push('--- CHI HA PROVATO ---');
+  ANAGRAFICA.forEach(d => {
+    const v = stato.anagrafica[d.id];
+    if(v) r.push(d.et + ': ' + v);
+  });
+  let totale = 0, fatte = 0, ok = 0, ko = 0, dubbio = 0, na = 0;
+  SEZIONI.forEach(s => s.voci.forEach((_, i) => {
+    totale++;
+    const e = stato.esiti[s.id + '-' + (i + 1)];
+    if(e){ fatte++;
+      if(e === 'ok') ok++; else if(e === 'ko') ko++;
+      else if(e === 'dubbio') dubbio++; else na++;
+    }
+  }));
+  r.push('');
+  r.push('--- IN NUMERI ---');
+  r.push('Prove compilate: ' + fatte + ' su ' + totale);
+  r.push('Funziona: ' + ok + ' · Non funziona: ' + ko + ' · Così così: ' + dubbio + ' · Non provato: ' + na);
+  r.push('');
+  r.push('--- QUELLO CHE NON VA ---');
+  let trovatoQualcosa = false;
+  SEZIONI.forEach(s => {
+    const righe = [];
+    s.voci.forEach((voce, i) => {
+      const id = s.id + '-' + (i + 1);
+      const e = stato.esiti[id];
+      const nota = (stato.note[id] || '').trim();
+      if(e === 'ko' || e === 'dubbio' || nota){
+        righe.push('  [' + etichettaEsito(e) + '] ' + voce.t + (nota ? '\n      nota: ' + nota : ''));
+      }
+    });
+    if(righe.length){
+      trovatoQualcosa = true;
+      r.push('');
+      r.push(s.titolo.toUpperCase());
+      righe.forEach(x => r.push(x));
+    }
+  });
+  if(!trovatoQualcosa) r.push('  (niente segnalato)');
+  const problemiPieni = stato.problemi.filter(p =>
+    Object.keys(p).some(k => String(p[k] || '').trim()));
+  if(problemiPieni.length){
+    r.push('');
+    r.push('--- PROBLEMI DESCRITTI ---');
+    problemiPieni.forEach((p, i) => {
+      r.push('');
+      r.push((i + 1) + '. ' + (p.titolo || 'senza titolo') + (p.gravita ? '  [' + p.gravita + ']' : ''));
+      if(p.dove)     r.push('   Dove: ' + p.dove);
+      if(p.passi)    r.push('   Come si rifà: ' + p.passi.replace(/\n/g, '\n     '));
+      if(p.atteso)   r.push('   Mi aspettavo: ' + p.atteso);
+      if(p.ottenuto) r.push('   È successo: ' + p.ottenuto);
+    });
+  }
+  r.push('');
+  r.push('--- MIGLIORIE, IDEE, NOTE ---');
+  LIBERE.forEach(d => {
+    const v = (stato.libere[d.id] || '').trim();
+    if(v){ r.push(''); r.push(d.et.toUpperCase()); r.push(v); }
+  });
+  r.push('');
+  r.push('--- GIUDIZIO ---');
+  VOTI.forEach(v => {
+    const n = stato.voti[v.id];
+    if(n) r.push(v.et + ': ' + n + '/5');
+  });
+  FINALI.forEach(d => {
+    const v = stato.finali[d.id];
+    if(v) r.push(d.et + ' ' + v);
+  });
+  r.push('');
+  r.push('--- TUTTE LE PROVE, UNA PER UNA ---');
+  SEZIONI.forEach(s => {
+    r.push('');
+    r.push(s.titolo.toUpperCase());
+    s.voci.forEach((voce, i) => {
+      const id = s.id + '-' + (i + 1);
+      r.push('  ' + (i + 1) + '. [' + etichettaEsito(stato.esiti[id]) + '] ' + voce.t);
+      const nota = (stato.note[id] || '').trim();
+      if(nota) r.push('      nota: ' + nota);
+    });
+  });
+  return r.join('\n');
+}
+
+document.getElementById('scarica').addEventListener('click', () => {
+  salva(true);
+  const contenuto = JSON.stringify(stato, null, 2);
+  const nome = nomeFile('json');
+  if(scaricaBlob(contenuto, nome, 'application/json;charset=utf-8') && !LIMITI.length){
+    segnala('File scaricato. Ora mandamelo pure per email o WhatsApp: grazie!');
+  } else {
+    segnala('Il file non è potuto uscire da qui: sotto trovi il testo da copiare.');
+    mostraRipiego(contenuto, nome);
+  }
+  inviaAlServer();
+});
+
+document.getElementById('scarica-testo').addEventListener('click', () => {
+  salva(true);
+  const testo = riepilogoTesto();
+  const nome = nomeFile('txt');
+  if(scaricaBlob('﻿' + testo, nome, 'text/plain;charset=utf-8') && !LIMITI.length){
+    segnala('Riepilogo leggibile scaricato.');
+  } else {
+    segnala('Il file non è potuto uscire da qui: sotto trovi il testo da copiare.');
+    mostraRipiego(testo, nome);
+  }
+});
+
+document.getElementById('copia').addEventListener('click', async () => {
+  const testo = riepilogoTesto();
+  try{
+    await navigator.clipboard.writeText(testo);
+    segnala('Riepilogo copiato: incollalo dove preferisci.');
+  }catch(e){
+    const t = document.createElement('textarea');
+    t.value = testo; document.body.appendChild(t); t.select();
+    try{ document.execCommand('copy'); segnala('Riepilogo copiato.'); }
+    catch(e2){ segnala('Copia non riuscita: usa «Scarica in chiaro».'); }
+    t.remove();
+  }
+});
+
+document.getElementById('email').addEventListener('click', () => {
+  const oggetto = 'Collaudo YachtNav — ' + (stato.anagrafica.nome || 'tester');
+  const testo = riepilogoTesto();
+  const corpo = testo.slice(0, 1500) +
+    '\n\n[Riepilogo accorciato. Allega anche il file .json scaricato dalla pagina.]';
+  try{
+    if(LIMITI.length) throw new Error('contesto limitato');
+    location.href = 'mailto:?subject=' + encodeURIComponent(oggetto) + '&body=' + encodeURIComponent(corpo);
+    segnala('Se non si è aperto il programma di posta, usa «Copia il riepilogo».');
+  }catch(e){
+    segnala('Da qui non si può aprire la posta: copia il testo qui sotto.');
+    mostraRipiego(testo, 'riepilogo per email');
+  }
+});
+
+document.getElementById('stampa').addEventListener('click', () => {
+  try{
+    window.print();
+  }catch(e){
+    segnala('La stampa da qui è bloccata: apri la pagina in una scheda del browser.');
+  }
+});
+
+/* Il campo file nascosto si apre col clic sull'etichetta, ma in un riquadro
+   quel clic può non arrivare: lo apro anche a mano, così si vede l'errore. */
+document.querySelector('label[for="importa"]').addEventListener('click', ev => {
+  ev.preventDefault();
+  try{ document.getElementById('importa').click(); }
+  catch(e){ segnala('Da qui non si può scegliere un file: apri la pagina in una scheda del browser.'); }
+});
+
+document.getElementById('importa').addEventListener('change', ev => {
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  const lettore = new FileReader();
+  lettore.onload = () => {
+    try{
+      const letto = JSON.parse(String(lettore.result));
+      if(!letto || typeof letto !== 'object' || !('esiti' in letto)) throw new Error('non è una scheda');
+      stato = Object.assign(vuoto(), letto);
+      salva(true);
+      location.reload();
+    }catch(e){
+      segnala('Non sono riuscito a leggere quel file: è una scheda di collaudo in formato .json?');
+    }
+  };
+  lettore.readAsText(file);
+  ev.target.value = '';
+});
+
+/* Conferma in due tempi invece di confirm(): nei riquadri le finestrelle del
+   browser sono zittite, e un tasto che cancella tutto senza chiedere niente
+   sarebbe peggio che inutile. Il secondo clic è deliberato quanto un «sì». */
+{
+  const tasto = document.getElementById('azzera');
+  const etichetta = tasto.textContent;
+  let armato = null;
+  tasto.addEventListener('click', () => {
+    if(!armato){
+      tasto.textContent = 'Sicuro? Premi di nuovo per cancellare';
+      segnala('Cancello tutto quello che hai scritto. Se non hai ancora scaricato il file, andrà perso.');
+      armato = setTimeout(() => { armato = null; tasto.textContent = etichetta; segnala(''); }, 6000);
+      return;
+    }
+    clearTimeout(armato);
+    try{ localStorage.removeItem(CHIAVE); }catch(e){}
+    stato = vuoto();
+    location.reload();
+  });
+}
+
+/* Raccolta automatica: attiva solo se RACCOLTA è valorizzato. */
+function inviaAlServer(){
+  if(!RACCOLTA) return;
+  try{
+    fetch(RACCOLTA, {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(stato), keepalive:true
+    }).then(r => { if(r.ok) segnala('File scaricato e inviato: grazie!'); })
+      .catch(() => {});
+  }catch(e){}
+}
+
+/* ===================== Avvio ======================================= */
+document.getElementById('versione-scheda').textContent = VERSIONE;
+if(LIMITI.length){
+  const avviso = el('div', { class:'avviso', style:'margin:1rem 0;border-color:var(--dubbio)', html:
+    '<strong>Aprila in una scheda del browser.</strong> Da qui ' + LIMITI.join(' e ') +
+    ': il salvataggio automatico e i tasti in fondo (scarica, stampa, posta) ' +
+    'possono non rispondere. Scarica il file <code>collaudo.html</code> e ' +
+    'aprilo con un doppio clic, oppure vai all’indirizzo della pagina.' });
+  document.querySelector('main').insertBefore(avviso, document.getElementById('indice'));
+}
+if(!stato.anagrafica.data){
+  stato.anagrafica.data = new Date().toISOString().slice(0,10);
+  const campoData = document.getElementById('c-data');
+  if(campoData) campoData.value = stato.anagrafica.data;
+}
+if(!stato.anagrafica.indirizzo){
+  const campoIndirizzo = document.getElementById('c-indirizzo');
+  if(campoIndirizzo && !campoIndirizzo.value) campoIndirizzo.placeholder = 'es. app.effdipi.it';
+}
+document.querySelectorAll('textarea.nota').forEach(t => {
+  if(t.value){ t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+});
+aggiornaTotali();
+if(stato.salvataAl){
+  segnala('Ripresa la scheda salvata il ' + new Date(stato.salvataAl).toLocaleString('it-IT') + ' su questo dispositivo.');
+}
+window.addEventListener('beforeunload', () => { clearTimeout(attesaSalvataggio); salva(true); });
+</script>
+</body>
+</html>
