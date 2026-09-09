@@ -36,8 +36,27 @@ Copia il blocco `<li class="scheda">` dentro `index.html` e cambia icona,
 indirizzo (`href`), titolo e descrizione. La griglia si riorganizza da sola e
 le lastre si rimettono in fila.
 
+Gli indirizzi da cambiare sono **due**, e vogliono lo stesso valore: quello sul
+titolo e quello sul link `class="copre"`, il gemello invisibile che rende
+cliccabile tutta la lastra. La lastra non può essere lei stessa un link perché
+dentro ce n'è più d'uno (le sotto-sezioni), e un link dentro un link non
+esiste. Allargare il link del titolo con un `::after` non funziona: il
+`transform` sull'`h2` gli fa da gabbia e il riquadro si ferma al testo.
+
 I progetti si aprono in una pagina nuova: è il `target="_blank"` sul link,
 lascialo dov'è. La freccina nella pastiglia di stato lo dice a chi guarda.
+
+## Le sotto-sezioni
+
+Quando un progetto ha una pagina che è *sua* — la scheda di collaudo di
+YachtNav, per dire — non merita una lastra a sé: sembrerebbe un altro
+progetto. Sta sulla stessa lastra, in fondo, sotto una riga sottile, nel blocco
+`<ul class="sotto">`. Se un progetto non ne ha, quel blocco si toglie e non
+resta niente.
+
+Ogni voce è un link vero con la sua icona e, se serve, un `<span class="a-chi">`
+che dice a chi è rivolta. Stanno davanti al gemello invisibile, quindi il clic
+ci arriva: il resto della lastra manda al progetto.
 
 L'icona è un SVG con `viewBox="0 0 24 24"` e `stroke="currentColor"`: prende da
 sé il colore giusto. Quella della barca è il marchio di YachtNav Manager.

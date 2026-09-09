@@ -279,7 +279,59 @@
   .icona svg { width: 1.5rem; height: 1.5rem; }
 
   .lastra h2 { margin: 0; font-size: 1.1875rem; font-weight: 620; letter-spacing: -.01em; transform: translateZ(14px); }
-  .lastra:focus-visible { outline: 2px solid var(--accento); outline-offset: .5rem; }
+  .lastra h2 a { color: inherit; text-decoration: none; }
+
+  /* Il gemello invisibile del titolo: copre la lastra intera perché la si
+     prenda con un clic dove capita, com'era quando la lastra ERA un link.
+     Serve un elemento a sé: allargare il link del titolo con un ::after non
+     funziona, perché il transform (e il preserve-3d) sull'h2 gli fa da
+     gabbia e il riquadro si ferma al testo. Da tastiera non si raggiunge e i
+     lettori di schermo lo saltano: il link vero, quello annunciato, è il
+     titolo. */
+  .lastra .copre { position: absolute; inset: 0; border-radius: inherit; }
+  /* Il resto della lastra non intercetta il puntatore, così il clic scende al
+     gemello che sta sotto. Le sotto-sezioni sì: sono link veri, e stanno
+     davanti. */
+  .lastra > .icona, .lastra > p, .lastra > .stato { pointer-events: none; }
+  .lastra:has(h2 a:focus-visible) { outline: 2px solid var(--accento); outline-offset: .5rem; }
+
+  /* Le sotto-sezioni del progetto: stanno sulla stessa lastra, sotto una
+     riga sottile, perché sono parte di quel progetto e non progetti a sé.
+     Stanno SOPRA il titolo allargato (z-index), altrimenti il clic finirebbe
+     sempre sul progetto. */
+  .sotto {
+    list-style: none;
+    width: 100%;
+    margin: .375rem 0 0;
+    padding: .75rem 0 0;
+    border-top: 1px solid var(--bordo);
+    transform: translateZ(8px);
+  }
+  .sotto li + li { margin-top: .125rem; }
+  .sotto a {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: .4375rem;
+    margin: -.3125rem -.5rem;
+    padding: .3125rem .5rem;
+    border-radius: .5rem;
+    color: var(--testo-tenue);
+    font-size: .84375rem;
+    text-decoration: none;
+    transition: color .2s ease, background-color .2s ease;
+  }
+  .sotto a svg { width: .9375rem; height: .9375rem; opacity: .75; }
+  .sotto a:hover, .sotto a:focus-visible { color: var(--accento); background: #ffffff12; }
+  .sotto a:hover svg, .sotto a:focus-visible svg { opacity: 1; }
+  .sotto a:focus-visible { outline: 2px solid var(--accento); outline-offset: 1px; }
+  .sotto .a-chi { color: var(--testo-tenue); opacity: .7; font-size: .78125rem; }
+  /* Col dito il bersaglio deve stare sopra i 44 px. Col mouse no: gonfierebbe
+     la lastra per niente. */
+  @media (pointer: coarse) {
+    .sotto a { min-height: 44px; margin: -.3125rem -.625rem; padding: .3125rem .625rem; }
+  }
 
   .lastra p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; transform: translateZ(10px); }
 
@@ -353,7 +405,11 @@
 
     <ul class="progetti">
       <li class="scheda">
-        <a class="lastra" href="https://yachtnav.effdipi.it" target="_blank" rel="noopener">
+        <!-- La lastra non è più un link: dentro ce n'è più d'uno (il progetto
+             e le sue sotto-sezioni) e un link dentro un link non esiste. Il
+             titolo copre tutta la lastra da sé — vedi .lastra h2 a::after. -->
+        <div class="lastra">
+          <a class="copre" href="https://yachtnav.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
           <span class="icona" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="5" r="2"></circle>
@@ -362,7 +418,7 @@
               <path d="M5 15a7 7 0 0 0 14 0"></path>
             </svg>
           </span>
-          <h2>YachtNav Manager</h2>
+          <h2><a href="https://yachtnav.effdipi.it" target="_blank" rel="noopener">YachtNav Manager</a></h2>
           <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
           <span class="stato">
             In prova
@@ -371,35 +427,29 @@
               <path d="M9 7h8v8"></path>
             </svg>
           </span>
-        </a>
-      </li>
 
-      <li class="scheda">
-        <a class="lastra" href="/collaudo/" target="_blank" rel="noopener">
-          <span class="icona" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"></path>
-              <rect x="9" y="2.5" width="6" height="3.5" rx="1"></rect>
-              <path d="m8.75 12.75 2 2 4-4.5"></path>
-              <path d="M9 17.75h6"></path>
-            </svg>
-          </span>
-          <h2>Collaudo YachtNav</h2>
-          <p>La scheda per chi prova l’app: prove da spuntare, problemi, migliorie e idee.</p>
-          <span class="stato">
-            Per i tester
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M7 17 17 7"></path>
-              <path d="M9 7h8v8"></path>
-            </svg>
-          </span>
-        </a>
+          <ul class="sotto">
+            <li>
+              <a href="/collaudo/" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"></path>
+                  <rect x="9" y="2.5" width="6" height="3.5" rx="1"></rect>
+                  <path d="m8.75 12.75 2 2 4-4.5"></path>
+                  <path d="M9 17.75h6"></path>
+                </svg>
+                Scheda di collaudo
+                <span class="a-chi">per i tester</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </li>
 
       <!-- Per aggiungerne un altro, copia il blocco <li> qui sopra e cambia
            icona, indirizzo (href), titolo e descrizione. La griglia si
            riorganizza da sola e le lastre si rimettono in fila.
-           target="_blank" apre il progetto in una pagina nuova: lascialo. -->
+           target="_blank" apre il progetto in una pagina nuova: lascialo.
+           Se il progetto non ha sotto-sezioni, togli il blocco <ul class="sotto">. -->
     </ul>
 
     <footer>effdipi.it</footer>
