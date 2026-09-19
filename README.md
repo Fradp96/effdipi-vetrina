@@ -101,13 +101,27 @@ Sta in `marchi/yachtnav/`:
 - `icona.svg` — il tratto bianco su piastrella blu, onde azzurre. È l'icona
   vera: scheda del browser, schermata di un telefono, app.
 - `icona-512.png` — la stessa, in PNG trasparente fuori dagli angoli, per chi
-  l'SVG non lo legge (le icone "aggiungi a schermata Home", per dire).
+  l'SVG non lo legge.
+- `icona-piena.svg` e `icona-piena-512.png` — piastrella piena, senza angoli
+  arrotondati, col segno un po' più piccolo. Serve dove la forma la ritaglia
+  il sistema: icona "maskable" di Android e schermata Home di iPhone. Lì gli
+  angoli trasparenti di `icona.svg` diventerebbero neri.
+- `badge.svg` — il segno bianco su vuoto, tratto più spesso. È il badge delle
+  notifiche nella barra di stato di Android, che usa solo la trasparenza come
+  maschera: una piastrella piena verrebbe un quadrato bianco.
+
+L'app YachtNav (repo `yachtnav-manager`, cartella `client/public`) ha le copie
+già pronte di tutti questi, alle misure che le servono.
 
 Le onde sono archi concentrici all'anello (centro 12,5), con lo stesso stacco
-dall'anello e fra loro. Se si ritocca il disegno, il PNG va rigenerato da
-`icona.svg`, non ridisegnato a parte: si fa con Edge senza finestra,
+dall'anello e fra loro. Se si ritocca il disegno, i PNG vanno rigenerati dagli
+SVG, non ridisegnati a parte: si fa con Edge senza finestra,
 
     msedge --headless=new --default-background-color=00000000 --window-size=512,512 --screenshot=icona-512.png icona.svg
+
+Sempre a 512, e poi si riduce. Edge ha una larghezza minima di finestra: sotto
+i 500 px circa l'SVG viene centrato in una finestra più larga e la cattura ne
+prende solo la striscia di sinistra.
 
 Colori: blu `#0b2a44`, bianco `#f2f7fb`, azzurro `#4fd3e6`.
 

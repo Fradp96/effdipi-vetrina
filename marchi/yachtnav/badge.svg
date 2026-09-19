@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Badge delle notifiche (barra di stato di Android): il sistema ne usa
+       solo la TRASPARENZA come maschera, quindi il segno va bianco su vuoto,
+       senza piastrella. Tratto più spesso: lo si vede a 24 dp. -->
+  <circle cx="12" cy="5" r="2"/>
+  <path d="M12 7v14M6 11h12M5 15a7 7 0 0 0 14 0"/>
+  <path d="M15.29 2.24A4.3 4.3 0 0 1 15.29 7.76M17.77 1.4A6.8 6.8 0 0 1 17.77 8.6"/>
+</svg>
