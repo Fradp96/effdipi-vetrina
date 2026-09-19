@@ -60,7 +60,7 @@ che dice a chi è rivolta. Stanno davanti al gemello invisibile, quindi il clic
 ci arriva: il resto della lastra manda al progetto.
 
 L'icona è un SVG con `viewBox="0 0 24 24"` e `stroke="currentColor"`: prende da
-sé il colore giusto. Quella della barca è il marchio di YachtNav Manager.
+sé il colore giusto. Quella di YachtNav è il suo marchio, vedi sotto.
 
 Ogni progetto vive dove gli pare: un sottodominio può puntare a un server
 diverso da un altro. Questa pagina è solo l'elenco.
@@ -74,6 +74,29 @@ nome, ed è anche l'icona della scheda del browser.
 Più piccolo di 6rem in testata non va messo: la scritta dentro il cerchio
 smette di leggersi. Per cambiarlo basta sostituire il file con un altro PNG
 quadrato con lo stesso nome.
+
+## Il marchio di YachtNav
+
+Un'ancora con due onde di segnale che escono dall'anello: la barca che parla.
+Niente nome dentro, apposta — il nome può cambiare, il segno resta.
+
+Sta in `marchi/yachtnav/`:
+
+- `segno.svg` — solo il tratto, monocromatico, `currentColor`. Va incollato
+  dentro la pagina (non come `<img>`, se no `currentColor` diventa nero): così
+  prende il colore del testo attorno. È quello della scheda qui in vetrina.
+- `icona.svg` — il tratto bianco su piastrella blu, onde azzurre. È l'icona
+  vera: scheda del browser, schermata di un telefono, app.
+- `icona-512.png` — la stessa, in PNG trasparente fuori dagli angoli, per chi
+  l'SVG non lo legge (le icone "aggiungi a schermata Home", per dire).
+
+Le onde sono archi concentrici all'anello (centro 12,5), con lo stesso stacco
+dall'anello e fra loro. Se si ritocca il disegno, il PNG va rigenerato da
+`icona.svg`, non ridisegnato a parte: si fa con Edge senza finestra,
+
+    msedge --headless=new --default-background-color=00000000 --window-size=512,512 --screenshot=icona-512.png icona.svg
+
+Colori: blu `#0b2a44`, bianco `#f2f7fb`, azzurro `#4fd3e6`.
 
 ## Pubblicare
 

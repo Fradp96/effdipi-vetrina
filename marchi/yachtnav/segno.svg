@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+  <!-- ancora -->
+  <circle cx="12" cy="5" r="2"/>
+  <path d="M12 7v14M6 11h12M5 15a7 7 0 0 0 14 0"/>
+  <!-- segnale: due archi concentrici all'anello, centro (12,5) -->
+  <path d="M15.29 2.24A4.3 4.3 0 0 1 15.29 7.76M17.77 1.4A6.8 6.8 0 0 1 17.77 8.6"/>
+</svg>
