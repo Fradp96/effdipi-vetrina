@@ -361,6 +361,39 @@
   /* La freccina dice che il progetto si apre in una pagina nuova. */
   .stato svg { width: .8125rem; height: .8125rem; opacity: .8; }
 
+  /* ── Lastre col tema del loro progetto ──────────────────────────────────
+     Una lastra può vestirsi coi colori della sua app: basta ridefinire qui le
+     variabili del vetro, e tutto il resto (bordo, alone, pastiglia, hover) le
+     segue. LoveMap: il blu notte e il rosa del cuore della sua schermata
+     iniziale, il lilla delle date. */
+  .scheda.tema-lovemap {
+    --vetro: #1a1a2eee;
+    --vetro-alto: #2a1f3df2;
+    --bordo: #4a3358;
+    --bordo-vivo: #ff758c;
+    --accento: #ff4d6d;
+    --pozza: #ff4d6d4d;
+    --riflesso: #ffd1dc33;
+    --testo: #ffffff;
+    --testo-tenue: #d8c3ea;
+    color: var(--testo);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .scheda.tema-lovemap {
+      --vetro: #fff5f7ee;
+      --vetro-alto: #ffffff;
+      --bordo: #f3c9d3;
+      --bordo-vivo: #ff4d6d;
+      /* più scuro del rosa dell'app: su fondo chiaro il testo piccolo della
+         pastiglia deve restare leggibile */
+      --accento: #d61f4b;
+      --pozza: #ff4d6d40;
+      --riflesso: #ffffffd0;
+      --testo: #1a1a2e;
+      --testo-tenue: #6b4a63;
+    }
+  }
+
   footer {
     margin-top: 4rem;
     text-align: center;
@@ -444,6 +477,28 @@
               </a>
             </li>
           </ul>
+        </div>
+      </li>
+
+      <li class="scheda tema-lovemap">
+        <div class="lastra">
+          <a class="copre" href="https://lovemap.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
+          <span class="icona" aria-hidden="true">
+            <!-- un segnaposto della mappa con un cuore dentro -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21.5s-7-6.1-7-11.6a7 7 0 0 1 14 0c0 5.5-7 11.6-7 11.6z"></path>
+              <path d="M12 13.1 9.6 10.7a1.55 1.55 0 0 1 2.2-2.2l.2.2.2-.2a1.55 1.55 0 0 1 2.2 2.2z"></path>
+            </svg>
+          </span>
+          <h2><a href="https://lovemap.effdipi.it" target="_blank" rel="noopener">LoveMap</a></h2>
+          <p>La mappa dei nostri viaggi e dei nostri ricordi.</p>
+          <span class="stato">
+            Privata
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17 17 7"></path>
+              <path d="M9 7h8v8"></path>
+            </svg>
+          </span>
         </div>
       </li>
 

@@ -62,6 +62,19 @@ ci arriva: il resto della lastra manda al progetto.
 L'icona è un SVG con `viewBox="0 0 24 24"` e `stroke="currentColor"`: prende da
 sé il colore giusto. Quella di YachtNav è il suo marchio, vedi sotto.
 
+## Lastre col tema del progetto
+
+Una lastra può vestirsi coi colori della sua app: si aggiunge una classe alla
+`<li class="scheda">` (per esempio `tema-lovemap`) e nello stile si
+ridefiniscono, solo per quella classe, le variabili del vetro (`--vetro`,
+`--vetro-alto`, `--bordo`, `--bordo-vivo`, `--accento`, `--pozza`, `--testo`,
+`--testo-tenue`), una volta per il tema scuro e una per il chiaro. Bordo, alone,
+pastiglia e hover le seguono da soli. Nel tema chiaro l'accento va scurito
+quanto basta perché il testo piccolo della pastiglia resti leggibile.
+
+LoveMap usa il blu notte e il rosa del cuore della sua schermata iniziale, e il
+lilla delle date. È privata: dietro il link c'è una schermata di accesso.
+
 Ogni progetto vive dove gli pare: un sottodominio può puntare a un server
 diverso da un altro. Questa pagina è solo l'elenco.
 
