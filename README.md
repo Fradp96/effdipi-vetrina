@@ -2,8 +2,9 @@
 
 La pagina di copertina di `effdipi.it`, servita da GitHub Pages.
 
-Un file solo, `index.html`, senza risorse esterne: si apre anche con un doppio
-clic per vedere com'è venuta prima di pubblicarla.
+Tutto sta in `index.html` più il logo, `logo.png`, accanto: niente risorse da
+altri siti. Si apre anche con un doppio clic per vedere com'è venuta prima di
+pubblicarla.
 
 ## Com'è fatta
 
@@ -66,9 +67,13 @@ diverso da un altro. Questa pagina è solo l'elenco.
 
 ## Il logo
 
-Nell'intestazione c'è ancora un **segnaposto**: la cornice tratteggiata. Quando
-c'è il logo effdipi vero, si sostituisce quel singolo `<svg class="segnaposto">`
-— stesse regole dell'icona qui sopra — e si toglie la classe.
+`logo.png` è il cerchio di Keep Palm, ritagliato dall'immagine originale su
+fondo nero: 512×512, fuori dal disco è trasparente. Sta in testata, sopra il
+nome, ed è anche l'icona della scheda del browser.
+
+Più piccolo di 6rem in testata non va messo: la scritta dentro il cerchio
+smette di leggersi. Per cambiarlo basta sostituire il file con un altro PNG
+quadrato con lo stesso nome.
 
 ## Pubblicare
 

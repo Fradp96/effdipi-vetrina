@@ -6,6 +6,8 @@
 <title>effdipi</title>
 <meta name="description" content="I progetti di Francesco Di Palma.">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
   :root {
     /* Rotazione della scena: la scrive il JS seguendo il puntatore. */
@@ -159,18 +161,25 @@
     transform: translateZ(70px);
   }
 
+  /* Il logo sta sopra il nome: più piccolo di così la scritta dentro il
+     cerchio non si legge più. */
   .marchio {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: .75rem;
+    gap: .875rem;
     font-size: 1.5rem;
     font-weight: 650;
     letter-spacing: -.02em;
   }
-  .marchio svg { width: 2rem; height: 2rem; color: var(--accento); }
-
-  /* Segnaposto: cornice tratteggiata finché non arriva il logo vero. */
-  .marchio .segnaposto { opacity: .8; }
+  .marchio img {
+    display: block;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    /* il blu del cerchio è quasi quello del fondo: un filo lo stacca */
+    box-shadow: 0 0 0 1px var(--bordo-vivo), 0 14px 34px -12px #000c;
+  }
 
   header p {
     margin: .875rem auto 0;
@@ -390,14 +399,7 @@
   <div class="mondo">
     <header>
       <div class="marchio">
-        <!-- SEGNAPOSTO: sostituisci questo <svg> con il logo effdipi.
-             Basta che sia un SVG con viewBox 0 0 24 24 e stroke/fill
-             "currentColor": prende da sé il colore dell'accento. -->
-        <svg class="segnaposto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke-dasharray="3 3.5"></rect>
-          <path d="M14 8h-1.75A2.25 2.25 0 0 0 10 10.25V16"></path>
-          <path d="M8.25 12h4"></path>
-        </svg>
+        <img src="logo.png" width="512" height="512" alt="Keep Palm">
         effdipi
       </div>
       <p>Progetti in lavorazione. Scegli quello che ti interessa.</p>
