@@ -231,6 +231,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    /* Tutte le lastre di una riga alte uguali: la cella della griglia si
+       allunga già da sé, ma senza questo la lastra dentro resta corta e le
+       schede finiscono sfalsate. */
+    height: 100%;
     gap: .5rem;
     padding: 1.5rem 1.5rem 1.375rem;
     border: 1px solid var(--bordo);
@@ -262,15 +266,33 @@
     pointer-events: none;
   }
 
-  .scheda:hover, .scheda:focus-within { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
-  .scheda:hover .lastra, .scheda:focus-within .lastra {
+  /* La lastra si solleva quando la punti o quando ci arrivi da tastiera.
+     Il sollevamento col puntatore sta dentro `hover: hover` APPOSTA: dove si
+     tocca, una scheda con uno stato `:hover` si prende il primo tocco per
+     accendersi e apre solo al secondo. Sul telefono il primo tocco deve
+     aprire. */
+  .scheda:focus-within { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
+  .scheda:focus-within .lastra {
     transform: translateZ(52px);
     border-color: var(--accento);
     box-shadow: var(--ombra-alta);
   }
-  .scheda:hover::after, .scheda:focus-within::after {
+  .scheda:focus-within::after {
     opacity: .55;
     transform: translateZ(-24px) rotateX(72deg) scale(1.14);
+  }
+
+  @media (hover: hover) {
+    .scheda:hover { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
+    .scheda:hover .lastra {
+      transform: translateZ(52px);
+      border-color: var(--accento);
+      box-shadow: var(--ombra-alta);
+    }
+    .scheda:hover::after {
+      opacity: .55;
+      transform: translateZ(-24px) rotateX(72deg) scale(1.14);
+    }
   }
 
   .icona {
@@ -691,8 +713,15 @@
 
   addEventListener("pointermove", function (e) {
     sx = e.clientX; sy = e.clientY; daFare = true;
-    mx = (sx / innerWidth) * 2 - 1;
-    my = (sy / innerHeight) * 2 - 1;
+    // Mentre punti una lastra la scena si ferma dov'è. Ruotando, il contenuto
+    // scorre di una quindicina di pixel: è poco, ma è quanto basta perché un
+    // clic mirato al bordo della scheda finisca fuori. L'onda sul muro
+    // continua a seguirti.
+    var sopra = e.target && e.target.closest && e.target.closest(".lastra");
+    if (!sopra) {
+      mx = (sx / innerWidth) * 2 - 1;
+      my = (sy / innerHeight) * 2 - 1;
+    }
     sveglia();
   }, { passive: true });
 
