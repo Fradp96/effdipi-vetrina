@@ -89,13 +89,18 @@
     background: radial-gradient(130% 90% at 50% 45%, var(--sfondo-lontano) 0%, var(--sfondo) 72%);
   }
 
-  .mondo {
+  /* In 3D ci sta SOLO il muro. Il contenuto davanti è piatto, e non è una
+     scelta di gusto: dentro una catena di preserve-3d il browser disegna le
+     lastre in un posto e le rende cliccabili in un altro — restava sensibile
+     solo il bordo esterno di ogni scheda. Misurato con clic veri, contro un
+     link piano come metro di paragone. */
+  .muro .mondo {
+    position: absolute;
+    inset: 0;
     transform: rotateX(var(--rx)) rotateY(var(--ry));
     transform-style: preserve-3d;
     transition: transform .12s linear;
   }
-
-  .muro .mondo { position: absolute; inset: 0; }
 
   .tessere {
     position: absolute;
@@ -150,15 +155,12 @@
     z-index: 1;
     width: 100%;
     max-width: 46rem;
-    perspective: 1200px;
-    perspective-origin: calc(50% + var(--pox)) calc(50% + var(--poy));
   }
 
   header {
     margin-bottom: 3rem;
     text-align: center;
     text-shadow: 0 1px 14px var(--sfondo), 0 1px 3px var(--sfondo);
-    transform: translateZ(70px);
   }
 
   /* Il logo sta sopra il nome: più piccolo di così la scritta dentro il
@@ -196,16 +198,10 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    transform-style: preserve-3d;
   }
 
-  /* La scheda è il posto nella vetrina: arco e profondità li calcola il JS
-     in base a dov'è finita nella griglia (--arc, --dz). */
   .scheda {
     position: relative;
-    transform: translateZ(var(--dz, 0px)) rotateY(var(--arc, 0deg));
-    transform-style: preserve-3d;
-    transition: transform .4s cubic-bezier(.2,.8,.2,1);
   }
 
   /* L'alone verde che la lastra lascia sul muro. */
@@ -217,7 +213,6 @@
     bottom: -1.75rem;
     height: 2.75rem;
     background: radial-gradient(50% 50% at 50% 50%, var(--pozza) 0%, transparent 72%);
-    transform: translateZ(-24px) rotateX(72deg);
     filter: blur(7px);
     opacity: .85;
     transition: opacity .4s ease, transform .4s cubic-bezier(.2,.8,.2,1);
@@ -244,9 +239,7 @@
     box-shadow: var(--ombra), inset 0 1px 0 var(--lume);
     color: inherit;
     text-decoration: none;
-    transform: translateZ(0);
-    transform-style: preserve-3d;
-    transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease, border-color .3s ease;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, border-color .3s ease;
   }
   @supports (backdrop-filter: blur(6px)) {
     .lastra { backdrop-filter: blur(9px) saturate(120%); }
@@ -271,27 +264,25 @@
      tocca, una scheda con uno stato `:hover` si prende il primo tocco per
      accendersi e apre solo al secondo. Sul telefono il primo tocco deve
      aprire. */
-  .scheda:focus-within { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
   .scheda:focus-within .lastra {
-    transform: translateZ(52px);
+    transform: translateY(-6px);
     border-color: var(--accento);
     box-shadow: var(--ombra-alta);
   }
   .scheda:focus-within::after {
     opacity: .55;
-    transform: translateZ(-24px) rotateX(72deg) scale(1.14);
+    transform: scale(1.14);
   }
 
   @media (hover: hover) {
-    .scheda:hover { transform: translateZ(calc(var(--dz, 0px) + 8px)) rotateY(calc(var(--arc, 0deg) * .35)); }
     .scheda:hover .lastra {
-      transform: translateZ(52px);
+      transform: translateY(-6px);
       border-color: var(--accento);
       box-shadow: var(--ombra-alta);
     }
     .scheda:hover::after {
       opacity: .55;
-      transform: translateZ(-24px) rotateX(72deg) scale(1.14);
+      transform: scale(1.14);
     }
   }
 
@@ -305,18 +296,16 @@
     border-radius: .75rem;
     background: #ffffff0d;
     color: var(--accento);
-    transform: translateZ(18px);
   }
   .icona svg { width: 1.5rem; height: 1.5rem; }
 
-  .lastra h2 { margin: 0; font-size: 1.1875rem; font-weight: 620; letter-spacing: -.01em; transform: translateZ(14px); }
+  .lastra h2 { margin: 0; font-size: 1.1875rem; font-weight: 620; letter-spacing: -.01em; }
   .lastra h2 a { color: inherit; text-decoration: none; }
 
   /* Il gemello invisibile del titolo: copre la lastra intera perché la si
      prenda con un clic dove capita, com'era quando la lastra ERA un link.
-     Serve un elemento a sé: allargare il link del titolo con un ::after non
-     funziona, perché il transform (e il preserve-3d) sull'h2 gli fa da
-     gabbia e il riquadro si ferma al testo. Da tastiera non si raggiunge e i
+     Serve un elemento a sé, non un ::after sul link del titolo: quello
+     resta legato al riquadro del titolo. Da tastiera non si raggiunge e i
      lettori di schermo lo saltano: il link vero, quello annunciato, è il
      titolo. */
   .lastra .copre { position: absolute; inset: 0; border-radius: inherit; }
@@ -336,7 +325,6 @@
     margin: .375rem 0 0;
     padding: .75rem 0 0;
     border-top: 1px solid var(--bordo);
-    transform: translateZ(8px);
   }
   .sotto li + li { margin-top: .125rem; }
   .sotto a {
@@ -364,7 +352,7 @@
     .sotto a { min-height: 44px; margin: -.3125rem -.625rem; padding: .3125rem .625rem; }
   }
 
-  .lastra p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; transform: translateZ(10px); }
+  .lastra p { margin: 0; color: var(--testo-tenue); font-size: .9375rem; }
 
   .stato {
     display: inline-flex;
@@ -378,7 +366,6 @@
     font-size: .75rem;
     letter-spacing: .02em;
     color: var(--accento);
-    transform: translateZ(10px);
   }
   /* La freccina dice che il progetto si apre in una pagina nuova. */
   .stato svg { width: .8125rem; height: .8125rem; opacity: .8; }
@@ -422,7 +409,6 @@
     text-shadow: 0 1px 12px var(--sfondo);
     color: var(--testo-tenue);
     font-size: .8125rem;
-    transform: translateZ(-40px);
   }
 
   /* Senza puntatore (dito, tavoletta) il muro dondola da solo. */
@@ -638,11 +624,9 @@
   }
 
   /* ── Le lastre in vetrina ──────────────────────────────────────────────
-     Stanno su un arco rivolto verso chi guarda: quelle ai lati girano verso
-     il centro e stanno un filo più indietro. Si misura sulla scatola di
-     layout (offsetLeft), che le rotazioni non toccano. */
-  var RAGGIO = 1500;
-
+     Le lastre stanno ferme e dritte: il 3D è tutto nel muro dietro. Qui si
+     calcola solo da dove parte il riflesso su ognuna, misurando sulla
+     scatola di layout (offsetLeft). */
   function disponi() {
     var schede = document.querySelectorAll(".progetti .scheda");
     if (!schede.length) return;
@@ -656,11 +640,11 @@
     }
     var centro = (sinistra + destra) / 2;
 
+    // Solo lo sfasamento del riflesso: la luce non scorre uguale su tutte le
+    // lastre. Posizione e inclinazione non si toccano piu — vedi la nota sul
+    // clic nello stile.
     for (i = 0; i < schede.length; i++) {
-      var dx = centri[i] - centro;
-      schede[i].style.setProperty("--arc", (-Math.atan(dx / RAGGIO) * 180 / Math.PI).toFixed(2) + "deg");
-      schede[i].style.setProperty("--dz", (-(dx * dx) / (2 * RAGGIO)).toFixed(1) + "px");
-      schede[i].style.setProperty("--sfasa", (dx / 1400).toFixed(3));
+      schede[i].style.setProperty("--sfasa", ((centri[i] - centro) / 1400).toFixed(3));
     }
   }
 
@@ -713,15 +697,8 @@
 
   addEventListener("pointermove", function (e) {
     sx = e.clientX; sy = e.clientY; daFare = true;
-    // Mentre punti una lastra la scena si ferma dov'è. Ruotando, il contenuto
-    // scorre di una quindicina di pixel: è poco, ma è quanto basta perché un
-    // clic mirato al bordo della scheda finisca fuori. L'onda sul muro
-    // continua a seguirti.
-    var sopra = e.target && e.target.closest && e.target.closest(".lastra");
-    if (!sopra) {
-      mx = (sx / innerWidth) * 2 - 1;
-      my = (sy / innerHeight) * 2 - 1;
-    }
+    mx = (sx / innerWidth) * 2 - 1;
+    my = (sy / innerHeight) * 2 - 1;
     sveglia();
   }, { passive: true });
 
