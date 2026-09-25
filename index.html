@@ -6,57 +6,33 @@
 <title>effdipi</title>
 <meta name="description" content="I progetti di Francesco Di Palma.">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#081640">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <style>
   :root {
-    /* Rotazione della scena: la scrive il JS seguendo il puntatore. */
-    --rx: 0deg;
-    --ry: 0deg;
-    --pox: 0%;
-    --poy: 0%;
+    /* La copertina è una notte: niente tema chiaro, apposta. */
+    color-scheme: dark;
+
+    /* Il riflesso sul vetro: lo sposta il JS seguendo il puntatore. */
     --luce: .5;
 
-    /* Palette del marchio: il nero, il blu del cerchio, il verde della
-       palma, il bianco. Tutto il resto sono sfumature di questi. */
-    --sfondo: #04070b;
-    --sfondo-lontano: #08243a;
-    --pannello-basso: #061c2c;
-    --pannello-alto: #1f6a99;
-    --vetro: #062133ee;
-    --vetro-alto: #0c3a5cf2;
-    --bordo: #1b5580;
-    --bordo-vivo: #3f92c9;
-    --lume: #ffffff1f;
-    --riflesso: #cfe8ff33;
+    /* Palette del quadro: il blu della notte, l'oro delle stelle e del
+       fiore, il bianco caldo della luna. */
+    --sfondo: #060f2e;
+    --vetro: #0a1a48e6;
+    --vetro-alto: #173275ee;
+    --bordo: #2b4a8c;
+    --bordo-vivo: #7d9be0;
+    --lume: #ffffff24;
+    --riflesso: #fff1c02e;
     --fusione: screen;
-    --pozza: #2f9e6847;
-    --testo: #eaf3fa;
-    --testo-tenue: #8ba8bf;
-    --accento: #4ec48c;
+    --pozza: #f5c45140;
+    --testo: #f6f1e1;
+    --testo-tenue: #b3c1e4;
+    --accento: #f5c451;
     --ombra: 0 2px 4px #0009, 0 30px 60px -24px #000e;
     --ombra-alta: 0 8px 18px #000b, 0 52px 90px -28px #000;
-  }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) {
-      --sfondo: #eef3f7;
-      --sfondo-lontano: #ffffff;
-      --pannello-basso: #b9cfe0;
-      --pannello-alto: #ffffff;
-      --vetro: #ffffffee;
-      --vetro-alto: #ffffff;
-      --bordo: #cadae6;
-      --bordo-vivo: #0b3a5b;
-      --lume: #ffffff;
-      --riflesso: #ffffffd0;
-      --fusione: normal;
-      --pozza: #1f8a5640;
-      --testo: #08243a;
-      --testo-tenue: #4d6b83;
-      --accento: #1f8a56;
-      --ombra: 0 1px 2px #08243a14, 0 18px 40px -20px #08243a40;
-      --ombra-alta: 0 4px 10px #08243a1c, 0 34px 60px -22px #08243a55;
-    }
   }
 
   * { box-sizing: border-box; }
@@ -74,82 +50,57 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Il muro ────────────────────────────────────────────────────────────
-     Una parete di pannelli quadrati a profondità diverse. Il puntatore ci
-     passa sopra e i pannelli lì attorno si girano e vengono avanti, poi
-     tornano al loro posto con calma. Li costruisce il JS.               */
-  .muro {
+  /* ── Il quadro ──────────────────────────────────────────────────────────
+     Una notte stellata vista da terra, a pancia in su: il cielo che gira in
+     vortici, gli alberi che salgono dai bordi verso il centro — ogni angolo
+     una stagione — e in basso i fiori d'oro. Lo dipinge il JS, a pennellate,
+     su quattro tele una sopra l'altra: il cielo, il bosco, i fiori, e quella
+     "viva" delle stelle che brillano e delle cose che cadono.
+
+     Alto `lvh`, non `vh`: sul telefono la barra dell'indirizzo che compare e
+     sparisce non deve costringere a ridipingere. */
+  .quadro {
     position: fixed;
-    inset: 0;
+    left: 0;
+    top: 0;
     z-index: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100lvh;
     overflow: hidden;
     pointer-events: none;
-    perspective: 1000px;
-    perspective-origin: calc(50% + var(--pox)) calc(50% + var(--poy));
-    background: radial-gradient(130% 90% at 50% 45%, var(--sfondo-lontano) 0%, var(--sfondo) 72%);
+    /* Senza JS resta questo: una notte e basta, ma una notte. */
+    background: radial-gradient(70% 60% at 50% 44%, #2656ab 0%, #133076 45%, #081640 80%, #060f2e 100%);
   }
 
-  /* In 3D ci sta SOLO il muro. Il contenuto davanti è piatto, e non è una
-     scelta di gusto: dentro una catena di preserve-3d il browser disegna le
-     lastre in un posto e le rende cliccabili in un altro — restava sensibile
-     solo il bordo esterno di ogni scheda. Misurato con clic veri, contro un
-     link piano come metro di paragone. */
-  .muro .mondo {
+  /* Le tele sbordano di 48 px per lato: col puntatore scivolano un poco
+     (parallasse) e il bordo non deve vedersi mai. Il 48 sta anche nel JS. */
+  .strato {
     position: absolute;
-    inset: 0;
-    transform: rotateX(var(--rx)) rotateY(var(--ry));
-    transform-style: preserve-3d;
-    transition: transform .12s linear;
+    left: -48px;
+    top: -48px;
+    width: calc(100% + 96px);
+    height: calc(100% + 96px);
+    opacity: 0;
+    transition: opacity 1.4s ease;
+    will-change: transform;
   }
+  .bosco { transform-origin: 50% 46%; }
+  .vivo { left: 0; top: 0; width: 100%; height: 100%; will-change: auto; }
+  .dipinto .strato { opacity: 1; }
 
-  .tessere {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    display: grid;
-    grid-template-columns: repeat(var(--colonne, 1), var(--lato, 72px));
-    grid-auto-rows: var(--lato, 72px);
-    gap: 3px;
-    transform: translate(-50%, -50%);
-    transform-style: preserve-3d;
-  }
-
-  /* --z0 e --tono li assegna il JS una volta sola: sono la faccia fissa del
-     pannello. --rY, --rX, --zp e --acceso cambiano col puntatore. */
-  .tessera {
-    --base: color-mix(in oklab, var(--pannello-alto) calc(var(--tono, .5) * 100%), var(--pannello-basso));
-    border-radius: 2px;
-    background-color: color-mix(in oklab, var(--accento) calc(var(--acceso, 0) * 48%), var(--base));
-    background-image: linear-gradient(148deg, #ffffff1c 0%, transparent 42%, #0000002b 100%);
-    box-shadow: inset 0 1px 0 #ffffff1a, 0 3px 8px #00000047;
-    transform:
-      translateZ(calc(var(--z0, 0px) + var(--zp, 0px)))
-      rotateY(var(--rY, 0deg))
-      rotateX(var(--rX, 0deg));
-    transition: transform .6s cubic-bezier(.18,.9,.24,1), background-color .6s ease;
-  }
-
-  /* Il velo che tiene leggibile il centro: il muro resta vivo ai bordi. */
+  /* Il velo che tiene leggibile il centro: il quadro resta vivo ai bordi.
+     Sta sopra il bosco e sotto i fiori, che così non si spengono. */
   .velo {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(62% 54% at 50% 46%, var(--sfondo) 34%, transparent 100%),
-      radial-gradient(125% 95% at 50% 45%, transparent 40%, var(--sfondo) 100%);
-    opacity: .92;
+    background: radial-gradient(46% 42% at 50% 44%, #050c26b8 0%, #050c2670 50%, transparent 100%);
   }
-
-  /* Schermi stretti e alti: il velo copre di più, se no il testo finisce
-     addosso ai pannelli. */
   @media (max-aspect-ratio: 4/5) {
-    .velo {
-      background:
-        radial-gradient(80% 46% at 50% 46%, var(--sfondo) 44%, transparent 100%),
-        radial-gradient(125% 95% at 50% 45%, transparent 40%, var(--sfondo) 100%);
-    }
+    .velo { background: radial-gradient(95% 52% at 50% 44%, #050c26b8 0%, #050c2670 55%, transparent 100%); }
   }
 
-  /* ── Il contenuto, davanti al muro ───────────────────────────────────── */
+  /* ── Il contenuto, davanti al quadro ─────────────────────────────────── */
   .scena {
     position: relative;
     z-index: 1;
@@ -160,7 +111,7 @@
   header {
     margin-bottom: 3rem;
     text-align: center;
-    text-shadow: 0 1px 14px var(--sfondo), 0 1px 3px var(--sfondo);
+    text-shadow: 0 1px 14px #050c26, 0 1px 3px #050c26;
   }
 
   /* Il logo sta sopra il nome: più piccolo di così la scritta dentro il
@@ -179,8 +130,8 @@
     width: 6rem;
     height: 6rem;
     border-radius: 50%;
-    /* il blu del cerchio è quasi quello del fondo: un filo lo stacca */
-    box-shadow: 0 0 0 1px var(--bordo-vivo), 0 14px 34px -12px #000c;
+    /* il blu del cerchio è quasi quello del cielo: un filo d'oro lo stacca */
+    box-shadow: 0 0 0 1px #f5c45199, 0 0 36px -6px #f5c45166, 0 14px 34px -12px #000c;
   }
 
   header p {
@@ -204,7 +155,7 @@
     position: relative;
   }
 
-  /* L'alone verde che la lastra lascia sul muro. */
+  /* L'alone d'oro che la lastra lascia sotto di sé. */
   .scheda::after {
     content: "";
     position: absolute;
@@ -219,8 +170,7 @@
     pointer-events: none;
   }
 
-  /* La lastra di vetro: è tutta un link, così si prende con un clic dove
-     capita. */
+  /* La lastra di vetro. */
   .lastra {
     position: relative;
     display: flex;
@@ -387,246 +337,128 @@
     --testo-tenue: #d8c3ea;
     color: var(--testo);
   }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) .scheda.tema-lovemap {
-      --vetro: #fff5f7ee;
-      --vetro-alto: #ffffff;
-      --bordo: #f3c9d3;
-      --bordo-vivo: #ff4d6d;
-      /* più scuro del rosa dell'app: su fondo chiaro il testo piccolo della
-         pastiglia deve restare leggibile */
-      --accento: #d61f4b;
-      --pozza: #ff4d6d40;
-      --riflesso: #ffffffd0;
-      --testo: #1a1a2e;
-      --testo-tenue: #6b4a63;
-    }
-  }
 
   footer {
     margin-top: 4rem;
     text-align: center;
-    text-shadow: 0 1px 12px var(--sfondo);
+    /* sotto ci sono le foglie e i fiori: serve un'ombra piena */
+    text-shadow: 0 0 6px #050c26, 0 0 16px #050c26, 0 1px 2px #050c26;
     color: var(--testo-tenue);
     font-size: .8125rem;
   }
 
-  /* Senza puntatore (dito, tavoletta) il muro dondola da solo. */
-  @media (hover: none) {
-    .mondo { animation: dondolo 20s ease-in-out infinite alternate; }
-  }
-  @keyframes dondolo {
-    from { transform: rotateY(-6deg) rotateX(2deg); }
-    to   { transform: rotateY(6deg) rotateX(-1.5deg); }
-  }
-
-  /* Chi ha chiesto meno movimento trova un muro fermo. */
+  /* Chi ha chiesto meno movimento trova il quadro fermo. */
   @media (prefers-reduced-motion: reduce) {
-    .mondo { animation: none; transition: none; }
-    .tessera { transition: none; }
+    .strato { transition: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="muro" aria-hidden="true">
-  <div class="mondo">
-    <div class="tessere"></div>
-  </div>
+<div class="quadro" aria-hidden="true">
+  <canvas class="strato cielo"></canvas>
+  <canvas class="strato bosco"></canvas>
   <div class="velo"></div>
+  <canvas class="strato fiori"></canvas>
+  <canvas class="strato vivo"></canvas>
 </div>
 
 <main class="scena">
-  <div class="mondo">
-    <header>
-      <div class="marchio">
-        <img src="logo.png" width="512" height="512" alt="Keep Palm">
-        effdipi
+  <header>
+    <div class="marchio">
+      <img src="logo.png" width="512" height="512" alt="Keep Palm">
+      effdipi
+    </div>
+    <p>Progetti in lavorazione. Scegli quello che ti interessa.</p>
+  </header>
+
+  <ul class="progetti">
+    <li class="scheda">
+      <!-- La lastra non è un link: dentro ce n'è più d'uno (il progetto e le
+           sue sotto-sezioni) e un link dentro un link non esiste. Tutta la
+           lastra si prende col gemello invisibile, il link class="copre". -->
+      <div class="lastra">
+        <a class="copre" href="https://yachtnav.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
+        <span class="icona" aria-hidden="true">
+          <!-- il segno di YachtNav: stesso disegno di marchi/yachtnav/segno.svg -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5" r="2"></circle>
+            <path d="M12 7v14M6 11h12M5 15a7 7 0 0 0 14 0"></path>
+            <path d="M15.29 2.24A4.3 4.3 0 0 1 15.29 7.76M17.77 1.4A6.8 6.8 0 0 1 17.77 8.6"></path>
+          </svg>
+        </span>
+        <h2><a href="https://yachtnav.effdipi.it" target="_blank" rel="noopener">YachtNav Manager</a></h2>
+        <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
+        <span class="stato">
+          In prova
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M9 7h8v8"></path>
+          </svg>
+        </span>
+
+        <ul class="sotto">
+          <li>
+            <a href="/collaudo/" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"></path>
+                <rect x="9" y="2.5" width="6" height="3.5" rx="1"></rect>
+                <path d="m8.75 12.75 2 2 4-4.5"></path>
+                <path d="M9 17.75h6"></path>
+              </svg>
+              Scheda di collaudo
+              <span class="a-chi">per i tester</span>
+            </a>
+          </li>
+        </ul>
       </div>
-      <p>Progetti in lavorazione. Scegli quello che ti interessa.</p>
-    </header>
+    </li>
 
-    <ul class="progetti">
-      <li class="scheda">
-        <!-- La lastra non è più un link: dentro ce n'è più d'uno (il progetto
-             e le sue sotto-sezioni) e un link dentro un link non esiste. Il
-             titolo copre tutta la lastra da sé — vedi .lastra h2 a::after. -->
-        <div class="lastra">
-          <a class="copre" href="https://yachtnav.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
-          <span class="icona" aria-hidden="true">
-            <!-- il segno di YachtNav: stesso disegno di marchi/yachtnav/segno.svg -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="5" r="2"></circle>
-              <path d="M12 7v14M6 11h12M5 15a7 7 0 0 0 14 0"></path>
-              <path d="M15.29 2.24A4.3 4.3 0 0 1 15.29 7.76M17.77 1.4A6.8 6.8 0 0 1 17.77 8.6"></path>
-            </svg>
-          </span>
-          <h2><a href="https://yachtnav.effdipi.it" target="_blank" rel="noopener">YachtNav Manager</a></h2>
-          <p>Gestionale per yacht: equipaggio, documenti, conformità, manutenzioni.</p>
-          <span class="stato">
-            In prova
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M7 17 17 7"></path>
-              <path d="M9 7h8v8"></path>
-            </svg>
-          </span>
+    <li class="scheda tema-lovemap">
+      <div class="lastra">
+        <a class="copre" href="https://lovemap.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
+        <span class="icona" aria-hidden="true">
+          <!-- un segnaposto della mappa con un cuore dentro -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21.5s-7-6.1-7-11.6a7 7 0 0 1 14 0c0 5.5-7 11.6-7 11.6z"></path>
+            <path d="M12 13.1 9.6 10.7a1.55 1.55 0 0 1 2.2-2.2l.2.2.2-.2a1.55 1.55 0 0 1 2.2 2.2z"></path>
+          </svg>
+        </span>
+        <h2><a href="https://lovemap.effdipi.it" target="_blank" rel="noopener">LoveMap</a></h2>
+        <p>La mappa dei nostri viaggi e dei nostri ricordi.</p>
+        <span class="stato">
+          Privata
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M9 7h8v8"></path>
+          </svg>
+        </span>
+      </div>
+    </li>
 
-          <ul class="sotto">
-            <li>
-              <a href="/collaudo/" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"></path>
-                  <rect x="9" y="2.5" width="6" height="3.5" rx="1"></rect>
-                  <path d="m8.75 12.75 2 2 4-4.5"></path>
-                  <path d="M9 17.75h6"></path>
-                </svg>
-                Scheda di collaudo
-                <span class="a-chi">per i tester</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </li>
+    <!-- Per aggiungerne un altro, copia il blocco <li> qui sopra e cambia
+         icona, indirizzo (href, due volte), titolo e descrizione. La griglia
+         si riorganizza da sola e le lastre si rimettono in fila.
+         target="_blank" apre il progetto in una pagina nuova: lascialo.
+         Se il progetto non ha sotto-sezioni, togli il blocco <ul class="sotto">. -->
+  </ul>
 
-      <li class="scheda tema-lovemap">
-        <div class="lastra">
-          <a class="copre" href="https://lovemap.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
-          <span class="icona" aria-hidden="true">
-            <!-- un segnaposto della mappa con un cuore dentro -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 21.5s-7-6.1-7-11.6a7 7 0 0 1 14 0c0 5.5-7 11.6-7 11.6z"></path>
-              <path d="M12 13.1 9.6 10.7a1.55 1.55 0 0 1 2.2-2.2l.2.2.2-.2a1.55 1.55 0 0 1 2.2 2.2z"></path>
-            </svg>
-          </span>
-          <h2><a href="https://lovemap.effdipi.it" target="_blank" rel="noopener">LoveMap</a></h2>
-          <p>La mappa dei nostri viaggi e dei nostri ricordi.</p>
-          <span class="stato">
-            Privata
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M7 17 17 7"></path>
-              <path d="M9 7h8v8"></path>
-            </svg>
-          </span>
-        </div>
-      </li>
-
-      <!-- Per aggiungerne un altro, copia il blocco <li> qui sopra e cambia
-           icona, indirizzo (href), titolo e descrizione. La griglia si
-           riorganizza da sola e le lastre si rimettono in fila.
-           target="_blank" apre il progetto in una pagina nuova: lascialo.
-           Se il progetto non ha sotto-sezioni, togli il blocco <ul class="sotto">. -->
-    </ul>
-
-    <footer>effdipi.it</footer>
-  </div>
+  <footer>effdipi.it</footer>
 </main>
 
 <script>
 (function () {
   "use strict";
 
-  var radice = document.documentElement;
-  var fermo = matchMedia("(prefers-reduced-motion: reduce)");
-  var puntatore = matchMedia("(hover: hover) and (pointer: fine)");
+  var PI = Math.PI;
+  var fermo = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var puntatore = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  /* ── Il muro ───────────────────────────────────────────────────────────
-     Una griglia di pannelli. Ognuno tiene la sua profondità e il suo tono
-     per sempre (rumore stabile sulle coordinate), così il muro non cambia
-     faccia a ogni ridimensionamento. */
-  var contenitore = document.querySelector(".tessere");
-  var tessere = [], colonne = 0, righe = 0, passo = 0, x0 = 0, y0 = 0;
+  /* ── Il riflesso sulle lastre ──────────────────────────────────────────
+     La luce non scorre uguale su tutte: ognuna parte un po' sfasata,
+     secondo quanto sta lontana dal centro della fila. */
+  var fila = document.querySelector(".progetti");
 
-  function caso(c, r) {
-    var n = Math.sin(c * 127.1 + r * 311.7) * 43758.5453;
-    return n - Math.floor(n);
-  }
-
-  function costruisci() {
-    if (!contenitore) return;
-
-    var lato = Math.max(52, Math.min(104, Math.round(innerWidth / 17)));
-    colonne = Math.ceil(innerWidth / (lato + 3)) + 2;
-    righe = Math.ceil(innerHeight / (lato + 3)) + 2;
-
-    /* Su schermi grandi i pannelli si allargano invece di moltiplicarsi. */
-    while (colonne * righe > 700 && lato < 200) {
-      lato += 10;
-      colonne = Math.ceil(innerWidth / (lato + 3)) + 2;
-      righe = Math.ceil(innerHeight / (lato + 3)) + 2;
-    }
-
-    passo = lato + 3;
-    x0 = (innerWidth - (colonne * passo - 3)) / 2;
-    y0 = (innerHeight - (righe * passo - 3)) / 2;
-
-    contenitore.style.setProperty("--lato", lato + "px");
-    contenitore.style.setProperty("--colonne", colonne);
-
-    var pezzi = document.createDocumentFragment();
-    tessere = [];
-    for (var r = 0; r < righe; r++) {
-      for (var c = 0; c < colonne; c++) {
-        var a = caso(c, r);
-        var t = document.createElement("i");
-        t.className = "tessera";
-        t.style.setProperty("--z0", Math.round((a - .5) * 76) + "px");
-        t.style.setProperty("--tono", a.toFixed(3));
-        pezzi.appendChild(t);
-        tessere.push({ e: t, x: x0 + c * passo + lato / 2, y: y0 + r * passo + lato / 2 });
-      }
-    }
-    contenitore.textContent = "";
-    contenitore.appendChild(pezzi);
-  }
-
-  var accese = [];
-
-  function spegni(t) {
-    var s = t.e.style;
-    s.removeProperty("--rY");
-    s.removeProperty("--rX");
-    s.removeProperty("--zp");
-    s.removeProperty("--acceso");
-  }
-
-  /* L'onda: i pannelli attorno al puntatore si girano e vengono avanti,
-     con addosso il verde del marchio. */
-  function onda(px, py) {
-    var R = 300, i;
-    for (i = 0; i < accese.length; i++) spegni(accese[i]);
-    accese.length = 0;
-    if (px === null || !colonne) return;
-
-    var c1 = Math.max(0, Math.floor((px - R - x0) / passo));
-    var c2 = Math.min(colonne - 1, Math.ceil((px + R - x0) / passo));
-    var r1 = Math.max(0, Math.floor((py - R - y0) / passo));
-    var r2 = Math.min(righe - 1, Math.ceil((py + R - y0) / passo));
-
-    for (var r = r1; r <= r2; r++) {
-      for (var c = c1; c <= c2; c++) {
-        var t = tessere[r * colonne + c];
-        if (!t) continue;
-        var dx = t.x - px, dy = t.y - py;
-        var d = Math.sqrt(dx * dx + dy * dy);
-        if (d > R) continue;
-
-        var f = 1 - d / R;
-        f = f * f * (3 - 2 * f);
-
-        var s = t.e.style;
-        s.setProperty("--rY", (-dx / R * 66 * f).toFixed(1) + "deg");
-        s.setProperty("--rX", (dy / R * 50 * f).toFixed(1) + "deg");
-        s.setProperty("--zp", Math.round(f * 82) + "px");
-        s.setProperty("--acceso", f.toFixed(3));
-        accese.push(t);
-      }
-    }
-  }
-
-  /* ── Le lastre in vetrina ──────────────────────────────────────────────
-     Le lastre stanno ferme e dritte: il 3D è tutto nel muro dietro. Qui si
-     calcola solo da dove parte il riflesso su ognuna, misurando sulla
-     scatola di layout (offsetLeft). */
   function disponi() {
     var schede = document.querySelectorAll(".progetti .scheda");
     if (!schede.length) return;
@@ -639,74 +471,992 @@
       if (s.offsetLeft + s.offsetWidth > destra) destra = s.offsetLeft + s.offsetWidth;
     }
     var centro = (sinistra + destra) / 2;
-
-    // Solo lo sfasamento del riflesso: la luce non scorre uguale su tutte le
-    // lastre. Posizione e inclinazione non si toccano piu — vedi la nota sul
-    // clic nello stile.
     for (i = 0; i < schede.length; i++) {
       schede[i].style.setProperty("--sfasa", ((centri[i] - centro) / 1400).toFixed(3));
     }
   }
 
-  var inCoda = false;
-  function rifai() {
-    if (inCoda) return;
-    inCoda = true;
-    requestAnimationFrame(function () {
-      inCoda = false;
-      costruisci();
-      disponi();
-    });
-  }
-
-  costruisci();
   disponi();
-  addEventListener("resize", rifai);
+  addEventListener("resize", disponi);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(disponi);
 
-  /* ── Lo sguardo ────────────────────────────────────────────────────────
-     Il puntatore ruota la scena di pochi gradi, sposta il riflesso sul
-     vetro e muove l'onda sul muro. */
-  if (fermo.matches || !puntatore.matches) return;
+  /* ── Il quadro ─────────────────────────────────────────────────────────
+     Tutto a pennellate: tratti corti e spessi che seguono un campo di
+     vortici, come nella Notte stellata. Il caso è seminato, quindi il quadro
+     è sempre lo stesso: cambia solo per adattarsi alla misura dello
+     schermo. */
+  var quadro = document.querySelector(".quadro");
+  if (!quadro) return;
+  var tela = {
+    cielo: quadro.querySelector(".cielo"),
+    bosco: quadro.querySelector(".bosco"),
+    fiori: quadro.querySelector(".fiori"),
+    vivo: quadro.querySelector(".vivo")
+  };
+  if (!tela.cielo.getContext || !window.Path2D) return;
 
-  var mx = 0, my = 0, vx = 0, vy = 0, giro = 0, sx = null, sy = null, daFare = false;
+  var M = 48;              // quanto le tele sbordano: lo stesso numero sta nello stile
+  var W = 0, H = 0, dpr = 1, g = null, generazione = 0;
+  var stelle = [], corolle = [];
 
-  function sveglia() {
-    if (!giro) giro = requestAnimationFrame(battito);
+  function semina(s) {
+    return function () {
+      s = s + 0x6D2B79F5 | 0;
+      var t = Math.imul(s ^ s >>> 15, 1 | s);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
   }
 
-  function battito() {
-    giro = 0;
+  function hash(x, y) {
+    var n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+    return n - Math.floor(n);
+  }
+  function rumore(x, y) {
+    var xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    var u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    var a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  }
+  function fbm(x, y) {
+    return rumore(x, y) * .6 + rumore(x * 2.1 + 5.3, y * 2.1 + 1.7) * .3 + rumore(x * 4.3 + 9.1, y * 4.3 + 3.3) * .1;
+  }
+  function liscio(a, b, x) {
+    var t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+  function tra(n, pal) { return pal[Math.max(0, Math.min(pal.length - 1, n))]; }
 
-    if (daFare) {
-      daFare = false;
-      onda(sx, sy);
+  /* Il pennello: raccoglie i tratti per colore e spessore e li stende tutti
+     insieme. Decine di migliaia di pennellate, qualche centinaio di
+     chiamate al disegno. */
+  function Pennello(ctx) { this.ctx = ctx; this.secchi = {}; this.ordine = []; }
+  Pennello.prototype.tratto = function (colore, spessore, p) {
+    var chiave = colore + "|" + (Math.round(spessore * 2) / 2 || .5);
+    var via = this.secchi[chiave];
+    if (!via) { via = this.secchi[chiave] = new Path2D(); this.ordine.push(chiave); }
+    var n = p.length;
+    via.moveTo(p[0], p[1]);
+    if (n === 2) { via.lineTo(p[0] + .01, p[1]); return; }  // un punto: con la punta tonda è un tocco
+    for (var i = 2; i < n - 2; i += 2) {
+      via.quadraticCurveTo(p[i], p[i + 1], (p[i] + p[i + 2]) / 2, (p[i + 1] + p[i + 3]) / 2);
+    }
+    via.lineTo(p[n - 2], p[n - 1]);
+  };
+  Pennello.prototype.stendi = function (caso) {
+    var ctx = this.ctx, o = this.ordine, i, j, t;
+    if (caso) for (i = o.length - 1; i > 0; i--) { j = Math.floor(caso() * (i + 1)); t = o[i]; o[i] = o[j]; o[j] = t; }
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    for (i = 0; i < o.length; i++) {
+      var k = o[i], sep = k.lastIndexOf("|");
+      ctx.strokeStyle = k.slice(0, sep);
+      ctx.lineWidth = +k.slice(sep + 1);
+      ctx.stroke(this.secchi[k]);
+    }
+    this.secchi = {};
+    this.ordine = [];
+  };
+
+  /* ── La geometria ──────────────────────────────────────────────────────
+     Al centro c'è la radura: un'ellisse di cielo aperto, col bordo mosso.
+     Fuori, il bosco. Sullo schermo largo la radura è larga, sul telefono è
+     un fiume di cielo in verticale fra due file di alberi. */
+  function geometria() {
+    var L = Math.min(W, H), orizz = W >= H;
+    var q = {
+      L: L, orizz: orizz,
+      cx: W / 2, cy: H * .46,
+      ax: W * (orizz ? .33 : .22),
+      ay: H * (orizz ? .34 : .37),
+      pen: Math.max(2.2, Math.min(4.6, L / 240))
+    };
+    q.A = orizz ? q.ax : q.ay;   // semiasse lungo
+    q.B = orizz ? q.ay : q.ax;   // semiasse corto
+    q.lr = Math.max(15, L * .034);
+    q.lx = q.cx + q.ax * (orizz ? .64 : .5);
+    q.ly = q.cy - q.ay * (orizz ? .5 : .58);
+    return q;
+  }
+
+  function bordo(a) {
+    return 1 + .09 * Math.sin(3 * a + 1.3) + .06 * Math.sin(5 * a + .4) + .04 * Math.sin(9 * a + 2.1);
+  }
+  /* Dove sta un punto rispetto alla radura: RA è l'angolo, RR la distanza
+     misurata in "bordi" (sotto 1 è cielo aperto). */
+  var RA = 0, RR = 0;
+  function radura(x, y) {
+    var nx = (x - g.cx) / g.ax, ny = (y - g.cy) / g.ay;
+    RA = Math.atan2(ny, nx);
+    RR = Math.sqrt(nx * nx + ny * ny) / bordo(RA);
+  }
+
+  /* Le stagioni girano attorno alla radura come le ore sull'orologio:
+     primavera in alto a sinistra, estate in alto a destra, autunno in basso
+     a destra, inverno in basso a sinistra. Sul confine si mescolano. */
+  var STAGIONI = [
+    { // primavera: fiori di pesco e le prime foglie
+      foglie: ["#3d2a4a", "#6b3a5e", "#9c4a78", "#c8628f", "#e486a8", "#f2a9c0", "#f9cad8", "#fde6ee"],
+      extra: ["#7fae55", "#b6d77a", "#5f8f45", "#ffffff"], pExtra: .16, densita: .95,
+      corteccia: ["#170f20", "#2c1d30", "#4a3040", "#74505e", "#a87686", "#e6b3c0"]
+    },
+    { // estate: il verde pieno, e le lucciole
+      foglie: ["#0d2a24", "#123d2e", "#1a5436", "#23703f", "#2f8a47", "#4aa354", "#78bf5f", "#a8d46a"],
+      extra: ["#f4e27a", "#fff3b0", "#2b7f95"], pExtra: .035, densita: 1,
+      corteccia: ["#0c1512", "#1b2a22", "#2f4030", "#4d6240", "#7f9a58", "#c4d77e"]
+    },
+    { // autunno: il fuoco
+      foglie: ["#3a130c", "#6b2410", "#9a3614", "#c24f17", "#de6f1d", "#ef8f26", "#f6b13a", "#fbd35e"],
+      extra: ["#ffe89a", "#a32a18", "#7a3a8c"], pExtra: .05, densita: .92,
+      corteccia: ["#140a10", "#2a1712", "#4a2616", "#7a3c18", "#b8622a", "#f0a048"]
+    },
+    { // inverno: rami nudi e neve, il cielo passa attraverso
+      foglie: ["#1b2a4e", "#2c4272", "#4a6497", "#7189bf", "#9fb4dc", "#c6d5ee", "#e6eef9", "#ffffff"],
+      extra: ["#d9d2f5", "#b7e3f2", "#ffffff"], pExtra: .12, densita: .26, chiome: .55,
+      corteccia: ["#0e1428", "#1d2742", "#34436a", "#5a6d98", "#9eb0d6", "#f4f8ff"]
+    }
+  ];
+
+  function stagioneDi(x, y, a, caso) {
+    var u = (a + PI) / (PI / 2) + (rumore(x * .005 + 17, y * .005 + 3) - .5) * .8;
+    u = (u % 4 + 4) % 4;
+    var k = Math.floor(u), f = u - k, d = .18;
+    if (f < d && caso() < .5 * (1 - f / d)) k = (k + 3) % 4;
+    else if (f > 1 - d && caso() < .5 * (1 - (1 - f) / d)) k = (k + 1) % 4;
+    return k;
+  }
+
+  /* ── Il cielo ──────────────────────────────────────────────────────────
+     Un nastro d'oro e di luce che serpeggia lungo la radura, con due gorghi;
+     la luna e le stelle grandi, ognuna al centro del suo vortice; attorno,
+     il blu che scorre a onde. */
+  var BLU = ["#081640", "#0b1d52", "#0f2663", "#133076", "#183b88", "#1e4799", "#2656ab", "#3066ba", "#3d78c8", "#5390d4"];
+  var CHIARI = ["#6fa6dc", "#93c1e6", "#bcdcef", "#e2eef2"];
+  var ORO = ["#c98a2e", "#e3a83b", "#f2c14e", "#f7d774", "#fbe9a6", "#fff6d8"];
+  var ACQUA = ["#1c5a78", "#23738f", "#3b93aa"];
+  var ALONE = ["#fff6d8", "#fbe9a6", "#f7d774", "#e2eef2", "#bcdcef", "#93c1e6", "#6fa6dc", "#3d78c8"];
+
+  function nastro(s) { return g.B * (.24 * Math.sin(s / g.A * 2.6 + .8) - .1); }
+  function pendenza(s) { return g.B * .24 * 2.6 / g.A * Math.cos(s / g.A * 2.6 + .8); }
+
+  function dipingiCielo(ctx, caso) {
+    var x0 = -M, y0 = -M, w = W + 2 * M, h = H + 2 * M, i, j;
+    var pen = new Pennello(ctx), wr = g.B * .24;
+
+    var fondo = ctx.createRadialGradient(g.cx, g.cy, 0, g.cx, g.cy, Math.sqrt(W * W + H * H) * .6);
+    fondo.addColorStop(0, "#1f4a98");
+    fondo.addColorStop(.5, "#12306e");
+    fondo.addColorStop(1, "#08163d");
+    ctx.fillStyle = fondo;
+    ctx.fillRect(x0, y0, w, h);
+
+    // I vortici: la luna, le stelle grandi, i due gorghi del nastro, e
+    // qualche mulinello sparso.
+    var vortici = [{ x: g.lx, y: g.ly, R: g.lr * 3.4, k: 1.5 }];
+    stelle = [];
+    var grandi = W < 700 ? 5 : 8, prove = 0;
+    while (stelle.length < grandi && prove++ < 600) {
+      var sx = g.cx + (caso() * 2 - 1) * g.ax * 1.05, sy = g.cy + (caso() * 2 - 1) * g.ay * 1.05;
+      radura(sx, sy);
+      if (RR > .92 || Math.hypot(sx - g.lx, sy - g.ly) < g.lr * 5) continue;
+      var vicina = false;
+      for (j = 0; j < stelle.length; j++) if (Math.hypot(sx - stelle[j].x, sy - stelle[j].y) < g.L * .16) vicina = true;
+      if (vicina) continue;
+      var sr = Math.max(4, g.L * (.008 + caso() * .009));
+      stelle.push({ x: sx, y: sy, r: sr, grande: true, fase: caso() * 6.3, ritmo: .6 + caso() * 1.2 });
+      vortici.push({ x: sx, y: sy, R: sr * 4.2, k: caso() < .5 ? 1.2 : -1.2 });
+    }
+    for (j = -1; j <= 1; j += 2) {
+      var s0 = j * g.A * .42, n0 = nastro(s0);
+      vortici.push({
+        x: g.orizz ? g.cx + s0 : g.cx + n0,
+        y: g.orizz ? g.cy + n0 : g.cy + s0,
+        R: g.B * .3, k: j * 1.8
+      });
+    }
+    for (j = 0; j < 6; j++) {
+      vortici.push({
+        x: x0 + caso() * w, y: y0 + caso() * h,
+        R: g.L * (.07 + caso() * .08), k: (caso() < .5 ? -1 : 1) * (.7 + caso() * .5)
+      });
     }
 
-    vx += (mx - vx) * .08;
-    vy += (my - vy) * .08;
+    function campo(x, y, v) {
+      var s = g.orizz ? x - g.cx : y - g.cy, n = g.orizz ? y - g.cy : x - g.cx;
+      var dn = n - nastro(s), wn = Math.exp(-dn * dn / (wr * wr) * 1.4);
+      var th = (g.orizz ? 0 : PI / 2) + (fbm(x * .0035 + 5, y * .0035 + 9) - .5) * 3;
+      var vx = Math.cos(th) * (1 - wn), vy = Math.sin(th) * (1 - wn);
+      var p = pendenza(s), pl = 1.6 * wn / Math.sqrt(1 + p * p);
+      if (g.orizz) { vx += pl; vy += p * pl; } else { vx += p * pl; vy += pl; }
+      for (var i = 0; i < vortici.length; i++) {
+        var o = vortici[i], dx = x - o.x, dy = y - o.y, d2 = dx * dx + dy * dy, R2 = o.R * o.R;
+        if (d2 > R2 * 9) continue;
+        var d = Math.sqrt(d2) + 1e-3, f = o.k * Math.exp(-d2 / R2) * 2.2;
+        vx += (-dy * f - dx * Math.abs(f) * .18) / d;
+        vy += (dx * f - dy * Math.abs(f) * .18) / d;
+      }
+      var l = Math.sqrt(vx * vx + vy * vy) || 1;
+      v[0] = vx / l;
+      v[1] = vy / l;
+    }
 
-    radice.style.setProperty("--ry", (vx * 9).toFixed(2) + "deg");
-    radice.style.setProperty("--rx", (-vy * 5.5).toFixed(2) + "deg");
-    radice.style.setProperty("--pox", (-vx * 7).toFixed(2) + "%");
-    radice.style.setProperty("--poy", (-vy * 5).toFixed(2) + "%");
-    radice.style.setProperty("--luce", (.5 - vx * .45).toFixed(3));
+    function tinta(x, y) {
+      var s = g.orizz ? x - g.cx : y - g.cy, n = g.orizz ? y - g.cy : x - g.cx;
+      var dn = n - nastro(s), fascia = wr * 1.15;
+      if (Math.abs(dn) < fascia) {
+        var q = 1 - Math.abs(dn) / fascia;
+        q *= q;
+        if (caso() < q * 1.45) {
+          // da una parte del nastro l'oro, dall'altra la luce fredda
+          var pal = dn < 0 ? ORO : CHIARI;
+          return tra(Math.floor(q * pal.length * .85 + caso() * 2.2), pal);
+        }
+      }
+      radura(x, y);
+      if (caso() < .05) return tra(Math.floor(caso() * 3), ACQUA);
+      if (caso() < .02) return tra(Math.floor(caso() * 2), CHIARI);
+      var t = fbm(x * .006 + 3, y * .006 + 7);
+      return tra(Math.floor((t - .2) * 1.6 * BLU.length + Math.max(0, 1 - RR) * 2.5 + (caso() - .5) * 3), BLU);
+    }
 
-    if (Math.abs(mx - vx) > .0005 || Math.abs(my - vy) > .0005) sveglia();
+    var v = [0, 0], tanti = Math.round(w * h / (g.pen * g.pen * 9));
+    for (var passata = 0; passata < 3; passata++) {
+      for (i = 0; i < tanti / 3; i++) {
+        var x = x0 + caso() * w, y = y0 + caso() * h;
+        var lun = g.pen * (4 + caso() * 5), passi = 5, dl = lun / passi, p = [x, y];
+        for (j = 0; j < passi; j++) { campo(x, y, v); x += v[0] * dl; y += v[1] * dl; p.push(x, y); }
+        pen.tratto(tinta(p[0], p[1]), g.pen * (.8 + caso() * .6), p);
+      }
+      pen.stendi(caso);
+    }
+
+    // Gli aloni: anelli di pennellate attorno alla luna e alle stelle.
+    function aureola(cx, cy, r0, anelli) {
+      for (var k = 0; k < anelli; k++) {
+        var rr = r0 * 1.3 + k * g.pen * 1.35 * (r0 > g.lr * .9 ? 1.4 : 1);
+        var giri = Math.max(7, Math.round(2 * PI * rr / (g.pen * 4.5)));
+        var a = caso() * 2 * PI;
+        for (var m = 0; m < giri; m++) {
+          var a1 = a + m * 2 * PI / giri, a2 = a1 + 2 * PI / giri * (.75 + caso() * .5);
+          var rj = rr + (caso() - .5) * g.pen * .7, p = [];
+          for (var z = 0; z <= 3; z++) {
+            var aa = a1 + (a2 - a1) * z / 3;
+            p.push(cx + Math.cos(aa) * rj, cy + Math.sin(aa) * rj);
+          }
+          var c = Math.floor(k / anelli * ALONE.length + (caso() - .5) * 1.6);
+          pen.tratto(tra(c, ALONE), g.pen * (.75 + caso() * .4), p);
+        }
+      }
+      pen.stendi();
+    }
+
+    for (i = 0; i < stelle.length; i++) {
+      var st = stelle[i];
+      aureola(st.x, st.y, st.r, 4);
+      ctx.fillStyle = "#ffe27a";
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 2 * PI); ctx.fill();
+      ctx.fillStyle = "#fffbe8";
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r * .45, 0, 2 * PI); ctx.fill();
+    }
+
+    // La luna: una falce d'oro con dentro il blu, nel suo vortice.
+    aureola(g.lx, g.ly, g.lr, 6);
+    ctx.fillStyle = "#f7d774";
+    ctx.beginPath(); ctx.arc(g.lx, g.ly, g.lr, 0, 2 * PI); ctx.fill();
+    ctx.fillStyle = "#1a3f8c";
+    ctx.beginPath(); ctx.arc(g.lx + g.lr * .42, g.ly - g.lr * .3, g.lr * .86, 0, 2 * PI); ctx.fill();
+    for (i = 0; i < 9; i++) {
+      var rl = g.lr * (.28 + caso() * .5), a0 = caso() * 2 * PI, pl = [];
+      for (j = 0; j <= 3; j++) {
+        var al = a0 + j * .45;
+        pl.push(g.lx + g.lr * .42 + Math.cos(al) * rl, g.ly - g.lr * .3 + Math.sin(al) * rl);
+      }
+      pen.tratto(caso() < .5 ? "#2656ab" : "#183b88", g.pen * .8, pl);
+    }
+    for (i = 0; i < 7; i++) {
+      var rf = g.lr * (.72 + i * .04), pf = [];
+      for (j = 0; j <= 6; j++) {
+        var af = 2.5 - 1.25 + j * 2.5 / 6 + (caso() - .5) * .1;
+        pf.push(g.lx + Math.cos(af) * rf, g.ly + Math.sin(af) * rf);
+      }
+      pen.tratto(i % 2 ? "#fbe9a6" : "#fff6d8", g.pen * .6, pf);
+    }
+    pen.stendi();
+
+    // Le stelle piccole: un tocco ciascuna, e metà di loro brilla.
+    var piccole = Math.round(W * H / 11000);
+    for (i = 0; i < piccole; i++) {
+      var px = x0 + caso() * w, py = y0 + caso() * h;
+      radura(px, py);
+      if (RR > 1.3) continue;
+      var pr = g.pen * (.45 + caso() * .6);
+      pen.tratto(caso() < .6 ? "#fff6d8" : "#f7d774", pr * 2, [px, py]);
+      if (caso() < .5) stelle.push({ x: px, y: py, r: pr, grande: false, fase: caso() * 6.3, ritmo: .8 + caso() * 2 });
+    }
+    pen.stendi();
+
+    ombraAiBordi(ctx, .5);
   }
 
-  addEventListener("pointermove", function (e) {
-    sx = e.clientX; sy = e.clientY; daFare = true;
-    mx = (sx / innerWidth) * 2 - 1;
-    my = (sy / innerHeight) * 2 - 1;
-    sveglia();
-  }, { passive: true });
+  function ombraAiBordi(ctx, forza) {
+    var o = ctx.createRadialGradient(g.cx, g.cy, g.L * .3, g.cx, g.cy, Math.sqrt(W * W + H * H) * .62);
+    o.addColorStop(0, "rgba(3, 7, 22, 0)");
+    o.addColorStop(1, "rgba(3, 7, 22, " + forza + ")");
+    ctx.fillStyle = o;
+    ctx.fillRect(-M, -M, W + 2 * M, H + 2 * M);
+  }
 
-  addEventListener("pointerleave", function () {
-    sx = null; sy = null; daFare = true;
-    mx = 0; my = 0;
-    sveglia();
+  /* ── Il bosco ──────────────────────────────────────────────────────────
+     Visto da sotto: i tronchi partono fuori dallo schermo e puntano tutti
+     verso il centro, dove si perdono nelle chiome. Prima il fitto delle
+     foglie, poi i tronchi dal più sottile (lontano) al più grosso (vicino),
+     ognuno con i suoi rami e le sue chiome sopra. Due fotogrammi: uno per il
+     fitto, uno per gli alberi. */
+  function foglia(pen, caso, x, y, k, luce) {
+    // la luna si tiene sgombro il suo pezzo di cielo
+    var lx = x - g.lx, ly = y - g.ly;
+    if (lx * lx + ly * ly < g.lr * g.lr * 7) return;
+    var st = STAGIONI[k], col;
+    if (caso() < st.pExtra) {
+      col = st.extra[Math.floor(caso() * st.extra.length)];
+      pen.tratto(col, g.pen * (.7 + caso() * .6), [x, y]);
+      return;
+    }
+    col = tra(Math.round(luce * (st.foglie.length - 1) + (caso() - .5) * 2.6), st.foglie);
+    var a = fbm(x * .007 + k * 7, y * .007) * 8 + (caso() - .5) * 1.1;
+    var lun = g.pen * (1.6 + caso() * 2.2), ca = Math.cos(a) * lun / 2, sa = Math.sin(a) * lun / 2;
+    var cu = (caso() - .5) * .6;
+    pen.tratto(col, g.pen * (.9 + caso() * .6), [x - ca, y - sa, x - sa * cu, y + ca * cu, x + ca, y + sa]);
+  }
+
+  // I ciuffi: un rumore lento che accende le foglie a macchie, così il
+  // fogliame fa volume invece di sembrare coriandoli.
+  function ciuffo(x, y, k) { return liscio(.38, .68, fbm(x * .014 + k * 3.1, y * .014 + 11)); }
+
+  // Il fitto: foglie ovunque fuori dalla radura, più scure verso i bordi
+  // dello schermo, più chiare dove prendono la luce del cielo.
+  function dipingiFitto(ctx, caso) {
+    var x0 = -M, y0 = -M, w = W + 2 * M, h = H + 2 * M, i;
+    var pen = new Pennello(ctx), tante = Math.round(w * h / (g.pen * g.pen * 2.6));
+    ctx.clearRect(x0, y0, w, h);
+    for (var passata = 0; passata < 2; passata++) {
+      for (i = 0; i < tante / 2; i++) {
+        var x = x0 + caso() * w, y = y0 + caso() * h;
+        radura(x, y);
+        if (RR < .9) continue;
+        var k = stagioneDi(x, y, RA, caso);
+        if (caso() > liscio(.9, 1.15, RR) * STAGIONI[k].densita) continue;
+        var luce = 1 - Math.min(1, (RR - .95) / 1.05);
+        foglia(pen, caso, x, y, k, luce * .6 + ciuffo(x, y, k) * .4 + (caso() - .5) * .12);
+      }
+      pen.stendi(caso);
+    }
+  }
+
+  // Gli alberi, sopra il fitto.
+  function dipingiAlberi(ctx, caso) {
+    var i, j, pen = new Pennello(ctx);
+
+    function uscita(ux, uy) {
+      var tx = ux > 0 ? (W + M - g.cx) / ux : ux < 0 ? (-M - g.cx) / ux : Infinity;
+      var ty = uy > 0 ? (H + M - g.cy) / uy : uy < 0 ? (-M - g.cy) / uy : Infinity;
+      return Math.min(tx, ty);
+    }
+
+    var N = Math.max(14, Math.min(30, Math.round((W + H) / 95))), alberi = [];
+    for (i = 0; i < N; i++) {
+      var a = -PI + (i + .5 + (caso() - .5) * .7) * 2 * PI / N, b = bordo(a);
+      var fin = 1 + caso() * .22;
+      var tx = g.cx + Math.cos(a) * g.ax * b * fin;
+      var ty = g.cy + Math.sin(a) * g.ay * b * fin;
+      var ux = tx - g.cx, uy = ty - g.cy, ul = Math.sqrt(ux * ux + uy * uy);
+      ux /= ul; uy /= ul;
+      var t = uscita(ux, uy) + M, sh = (caso() - .5) * g.L * .08;
+      var bx = g.cx + ux * t - uy * sh, by = g.cy + uy * t + ux * sh;
+      var lun = Math.sqrt((tx - bx) * (tx - bx) + (ty - by) * (ty - by));
+      var w0 = Math.max(g.pen * 3, Math.min(g.L * (.035 + caso() * .05), lun * .22));
+      var curva = (caso() - .5) * lun * .12;
+      alberi.push({
+        bx: bx, by: by, tx: tx, ty: ty,
+        kx: (bx + tx) / 2 - uy * curva, ky: (by + ty) / 2 + ux * curva,
+        w0: w0, w1: w0 * .2, lun: lun,
+        k: stagioneDi(tx, ty, a, caso)
+      });
+    }
+    alberi.sort(function (p, q) { return p.w0 - q.w0; });
+
+    var q = [0, 0, 0, 0];
+    function punto(al, t) {
+      var u = 1 - t;
+      q[0] = u * u * al.bx + 2 * u * t * al.kx + t * t * al.tx;
+      q[1] = u * u * al.by + 2 * u * t * al.ky + t * t * al.ty;
+      var dx = 2 * u * (al.kx - al.bx) + 2 * t * (al.tx - al.kx);
+      var dy = 2 * u * (al.ky - al.by) + 2 * t * (al.ty - al.ky), dl = Math.sqrt(dx * dx + dy * dy) || 1;
+      q[2] = -dy / dl;   // la normale
+      q[3] = dx / dl;
+    }
+    // la corteccia non è un tubo: la larghezza ondeggia un poco
+    function largo(al, t) { return (al.w0 + (al.w1 - al.w0) * Math.pow(t, .8)) * (1 + .07 * Math.sin(t * 19 + al.w0)); }
+
+    function ramo(x, y, ang, lun, sp, livello, pal, punte) {
+      var p = [x, y], n = 4, a = ang, m;
+      for (m = 0; m < n; m++) {
+        a += (caso() - .5) * .45;
+        x += Math.cos(a) * lun / n;
+        y += Math.sin(a) * lun / n;
+        p.push(x, y);
+      }
+      for (m = 0; m < n; m++) {
+        pen.tratto(pal[1], Math.max(1, sp * (1 - m / n * .75)), [p[2 * m], p[2 * m + 1], p[2 * m + 2], p[2 * m + 3]]);
+      }
+      pen.tratto(pal[pal.length - 2], Math.max(.8, sp * .3), p.slice(0, 6));
+      if (livello > 0) {
+        var figli = 2 + Math.floor(caso() * 2);
+        for (m = 0; m < figli; m++) {
+          var z = 1 + Math.floor(caso() * (n - 1));
+          ramo(p[2 * z], p[2 * z + 1], ang + (caso() < .5 ? -1 : 1) * (.4 + caso() * .5), lun * .5, sp * .5, livello - 1, pal, punte);
+        }
+      }
+      punte.push(x, y);
+    }
+
+    function chioma(cx, cy, cr, k) {
+      var st = STAGIONI[k], tante = Math.round(cr * cr / (g.pen * g.pen * 1.3) * (st.chiome || st.densita));
+      var vx = g.cx - cx, vy = g.cy - cy, vl = Math.sqrt(vx * vx + vy * vy) || 1;
+      vx /= vl; vy /= vl;
+      for (var m = 0; m < tante; m++) {
+        var rr = cr * Math.sqrt(caso()), aa = caso() * 2 * PI;
+        var x = cx + Math.cos(aa) * rr, y = cy + Math.sin(aa) * rr;
+        radura(x, y);
+        var verso = .5 + .5 * ((x - cx) * vx + (y - cy) * vy) / cr;
+        var fuori = 1 - Math.min(1, Math.max(0, RR - .95) / 1.05);
+        foglia(pen, caso, x, y, k, verso * .55 + fuori * .45);
+      }
+    }
+
+    for (i = 0; i < alberi.length; i++) {
+      var al = alberi[i], pal = STAGIONI[al.k].corteccia, inverno = al.k === 3;
+      var passi = Math.max(10, Math.round(al.lun / (g.pen * 4)));
+
+      // la sagoma, nel colore più scuro
+      var sin = [], des = [];
+      for (j = 0; j <= passi; j++) {
+        var tt = j / passi, l2 = largo(al, tt) / 2;
+        punto(al, tt);
+        sin.push(q[0] + q[2] * l2, q[1] + q[3] * l2);
+        des.push(q[0] - q[2] * l2, q[1] - q[3] * l2);
+      }
+      ctx.fillStyle = pal[0];
+      ctx.beginPath();
+      ctx.moveTo(sin[0], sin[1]);
+      for (j = 2; j < sin.length; j += 2) ctx.lineTo(sin[j], sin[j + 1]);
+      for (j = des.length - 2; j >= 0; j -= 2) ctx.lineTo(des[j], des[j + 1]);
+      ctx.closePath();
+      ctx.fill();
+
+      // la corteccia: corsie di pennellate per il lungo, più chiare dal
+      // lato che guarda la luna
+      punto(al, .5);
+      var lato = (g.lx - q[0]) * q[2] + (g.ly - q[1]) * q[3] > 0 ? 1 : -1;
+      var corsie = Math.max(3, Math.min(14, Math.round(al.w0 / g.pen)));
+      for (var c = 0; c < corsie; c++) {
+        var off = (c + .5) / corsie * 2 - 1, luce = (off * lato + 1) / 2;
+        var t0 = caso() * .04;
+        while (t0 < 1) {
+          var dt = g.pen * (5 + caso() * 10) / al.lun, t1 = Math.min(1, t0 + dt), p = [];
+          for (var z = 0; z <= 3; z++) {
+            var tz = t0 + (t1 - t0) * z / 3;
+            punto(al, tz);
+            var lz = largo(al, tz) / 2 * off * .9 + (caso() - .5) * g.pen * .3;
+            p.push(q[0] + q[2] * lz, q[1] + q[3] * lz);
+          }
+          // dal lato in ombra, ogni tanto, il blu della notte
+          var col = luce < .45 && caso() < .08 ? "#183b88"
+                  : tra(Math.round(Math.pow(luce, 1.15) * (pal.length - 1) + (caso() - .5) * 1.6), pal);
+          pen.tratto(col, Math.max(1, largo(al, t0) / corsie * 1.3), p);
+          if (t1 >= 1) break;
+          t0 = t1 - dt * .2 * caso();   // un filo sovrapposte, come a mano
+        }
+      }
+
+      // i rami: d'inverno tanti e nudi, con le loro ramaglie
+      var punte = [], rami = inverno ? 5 + Math.floor(caso() * 3) : 2 + Math.floor(caso() * 3);
+      for (j = 0; j < rami; j++) {
+        var tr = .45 + caso() * .5;
+        punto(al, tr);
+        var dir = Math.atan2(-q[2], q[3]) + (caso() < .5 ? -1 : 1) * (.35 + caso() * .5);
+        ramo(q[0], q[1], dir, al.lun * (.12 + caso() * .16), largo(al, tr) * .45, inverno ? 2 : 1, pal, punte);
+      }
+      pen.stendi();
+
+      // le chiome: coprono la cima del tronco e le punte dei rami
+      var chiome = 3 + Math.floor(caso() * 4);
+      for (j = 0; j < chiome; j++) {
+        var tc = .62 + caso() * .42;
+        punto(al, Math.min(1, tc));
+        var cr = Math.max(largo(al, Math.min(1, tc)) * 1.6, g.pen * 7) * (.9 + caso() * .6);
+        chioma(q[0] + (caso() - .5) * cr * .6, q[1] + (caso() - .5) * cr * .6, cr, al.k);
+      }
+      for (j = 0; j < punte.length; j += 2) {
+        if (caso() < (inverno ? .5 : .15)) continue;
+        chioma(punte[j], punte[j + 1], g.pen * (4 + caso() * 5), al.k);
+      }
+      pen.stendi(caso);
+    }
+
+    // L'ombra ai bordi, solo su quello che è dipinto.
+    ctx.globalCompositeOperation = "source-atop";
+    ombraAiBordi(ctx, .55);
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  /* ── I fiori ───────────────────────────────────────────────────────────
+     Gigli d'oro che salgono dal basso, davanti a tutto, e fanno luce da
+     sé. Uno grande e due più piccoli, un po' a sinistra del centro: il
+     piè di pagina, che sta nel mezzo, non ci finisce sopra. */
+  function dipingiFiori(ctx, caso) {
+    ctx.clearRect(-M, -M, W + 2 * M, H + 2 * M);
+    corolle = [];
+    var S = Math.max(28, Math.min(74, g.L * .068)), cx = g.cx - S;
+    var fiori = [
+      { x: cx - S * .7, y: H - S * 2.45, s: S, piega: -.1, piede: cx - S * .2 },
+      { x: cx + S * 2.9, y: H - S * 1.5, s: S * .62, piega: .3, piede: cx + S * 2.1 },
+      { x: cx - S * 2.9, y: H - S * 1.2, s: S * .48, piega: -.4, piede: cx - S * 1.8 }
+    ];
+
+    // un po' di buio dietro, perché l'oro stacchi anche sulle foglie d'autunno
+    var buio = ctx.createRadialGradient(cx, H, 0, cx, H, S * 5.5);
+    buio.addColorStop(0, "rgba(4, 8, 24, .6)");
+    buio.addColorStop(1, "rgba(4, 8, 24, 0)");
+    ctx.fillStyle = buio;
+    ctx.fillRect(cx - S * 5.5, H - S * 5.5, S * 11, S * 5.5 + M);
+
+    // il bagliore che i fiori fanno sul prato
+    ctx.globalCompositeOperation = "lighter";
+    var prato = ctx.createRadialGradient(cx, H + S * .5, 0, cx, H + S * .5, S * 5);
+    prato.addColorStop(0, "rgba(255, 196, 90, .30)");
+    prato.addColorStop(1, "rgba(255, 196, 90, 0)");
+    ctx.fillStyle = prato;
+    ctx.fillRect(cx - S * 5, H - S * 5, S * 10, S * 6);
+    ctx.globalCompositeOperation = "source-over";
+
+    var i, f;
+    for (i = 0; i < fiori.length; i++) {
+      f = fiori[i];
+      stelo(ctx, f.piede, H + M, f.x, f.y + f.s * .15, f.s);
+    }
+    // le foglie alla base, lunghe e appuntite
+    for (i = 0; i < 9; i++) {
+      var fx = cx + (caso() - .5) * S * 6, fa = -PI / 2 + (fx - cx) / (S * 5) * 1.3 + (caso() - .5) * .5;
+      fogliaLunga(ctx, fx, H + S * .3, fa, S * (1.3 + caso() * 1.3), S * (.18 + caso() * .1), caso);
+    }
+    for (i = 0; i < fiori.length; i++) {
+      f = fiori[i];
+      giglio(ctx, f.x, f.y, f.s, f.piega, caso);
+      corolle.push({ x: f.x, y: f.y, s: f.s });
+    }
+  }
+
+  function stelo(ctx, x0, y0, x1, y1, S) {
+    var kx = x0 + (x1 - x0) * .2, ky = y0 + (y1 - y0) * .55, n = 14, px = x0, py = y0;
+    ctx.lineCap = "round";
+    for (var i = 1; i <= n; i++) {
+      var t = i / n, u = 1 - t;
+      var x = u * u * x0 + 2 * u * t * kx + t * t * x1, y = u * u * y0 + 2 * u * t * ky + t * t * y1;
+      ctx.strokeStyle = "#173d2b";
+      ctx.lineWidth = S * (.14 - .07 * t);
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+      ctx.strokeStyle = "#4f8f5d";
+      ctx.lineWidth = S * .025;
+      ctx.beginPath(); ctx.moveTo(px - S * .03, py); ctx.lineTo(x - S * .03, y); ctx.stroke();
+      px = x; py = y;
+    }
+  }
+
+  function fogliaLunga(ctx, x, y, a, lun, larg, caso) {
+    var ux = Math.cos(a), uy = Math.sin(a), nx = -uy, ny = ux, pie = (caso() - .5) * lun * .5;
+    var tx = x + ux * lun + nx * pie, ty = y + uy * lun + ny * pie;
+    ctx.beginPath();
+    ctx.moveTo(x - nx * larg * .5, y - ny * larg * .5);
+    ctx.quadraticCurveTo(x + ux * lun * .5 + nx * (larg + pie * .4), y + uy * lun * .5 + ny * (larg + pie * .4), tx, ty);
+    ctx.quadraticCurveTo(x + ux * lun * .5 - nx * (larg - pie * .4), y + uy * lun * .5 - ny * (larg - pie * .4), x + nx * larg * .5, y + ny * larg * .5);
+    ctx.closePath();
+    var gr = ctx.createLinearGradient(x, y, tx, ty);
+    gr.addColorStop(0, "#0e2a1f");
+    gr.addColorStop(.6, "#24573a");
+    gr.addColorStop(1, "#3f7d4f");
+    ctx.fillStyle = gr;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(111, 174, 106, .55)";
+    ctx.lineWidth = Math.max(1, larg * .12);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + ux * lun * .5 + nx * pie * .4, y + uy * lun * .5 + ny * pie * .4, tx, ty);
+    ctx.stroke();
+  }
+
+  function giglio(ctx, x, y, S, piega, caso) {
+    var i;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    var gl = ctx.createRadialGradient(x, y, 0, x, y, S * 2.6);
+    gl.addColorStop(0, "rgba(255, 214, 110, .45)");
+    gl.addColorStop(.4, "rgba(255, 180, 70, .14)");
+    gl.addColorStop(1, "rgba(255, 160, 60, 0)");
+    ctx.fillStyle = gl;
+    ctx.fillRect(x - S * 2.6, y - S * 2.6, S * 5.2, S * 5.2);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(piega);
+
+    // sei petali; quelli dietro (in alto) prima, e un poco in ombra
+    var petali = [];
+    for (i = 0; i < 6; i++) petali.push(-PI / 2 + PI / 6 + i * PI / 3 + (caso() - .5) * .18);
+    petali.sort(function (a, b) { return Math.sin(a) - Math.sin(b); });
+
+    for (i = 0; i < petali.length; i++) {
+      var a = petali[i], dietro = Math.sin(a) < -.1;
+      var Lp = S * (.95 + caso() * .15), wp = S * (.3 + caso() * .06);
+      var tx = Math.cos(a) * Lp, ty = Math.sin(a) * Lp * .72 - Lp * .16;
+      var dl = Math.sqrt(tx * tx + ty * ty), ux = tx / dl, uy = ty / dl, px = -uy, py = ux;
+      var curl = (caso() - .5) * wp * .7;
+      var forma = new Path2D();
+      forma.moveTo(0, 0);
+      forma.bezierCurveTo(ux * dl * .25 + px * wp, uy * dl * .25 + py * wp, ux * dl * .8 + px * wp * .7, uy * dl * .8 + py * wp * .7, tx + px * curl, ty + py * curl);
+      forma.bezierCurveTo(ux * dl * .8 - px * wp * .7, uy * dl * .8 - py * wp * .7, ux * dl * .25 - px * wp, uy * dl * .25 - py * wp, 0, 0);
+      var gr = ctx.createLinearGradient(0, 0, tx, ty);
+      gr.addColorStop(0, "#7d2744");
+      gr.addColorStop(.2, "#c2562f");
+      gr.addColorStop(.47, "#eea23a");
+      gr.addColorStop(.76, "#f8cf62");
+      gr.addColorStop(1, "#fff0b3");
+      ctx.fillStyle = gr;
+      ctx.fill(forma);
+      if (dietro) { ctx.fillStyle = "rgba(30, 12, 50, .32)"; ctx.fill(forma); }
+      ctx.strokeStyle = "rgba(150, 70, 20, .6)";
+      ctx.lineWidth = Math.max(.8, S * .012);
+      ctx.stroke(forma);
+
+      // le venature, a pennellate chiare
+      ctx.strokeStyle = "rgba(255, 238, 175, .6)";
+      ctx.lineWidth = Math.max(.8, S * .018);
+      ctx.lineCap = "round";
+      for (var v = -1; v <= 1; v++) {
+        ctx.beginPath();
+        ctx.moveTo(ux * dl * .18 + px * wp * v * .15, uy * dl * .18 + py * wp * v * .15);
+        ctx.quadraticCurveTo(ux * dl * .55 + px * wp * v * .45, uy * dl * .55 + py * wp * v * .45, ux * dl * .9 + px * (wp * v * .15 + curl * .8), uy * dl * .9 + py * (wp * v * .15 + curl * .8));
+        ctx.stroke();
+      }
+      // i puntini scuri vicino al cuore
+      if (!dietro) {
+        ctx.fillStyle = "rgba(105, 28, 64, .8)";
+        for (v = 0; v < 4; v++) {
+          var d = dl * (.12 + caso() * .22), sd = (caso() - .5) * wp * .6;
+          ctx.beginPath();
+          ctx.arc(ux * d + px * sd, uy * d + py * sd, Math.max(.8, S * .018), 0, 2 * PI);
+          ctx.fill();
+        }
+      }
+    }
+
+    // il cuore che fa luce
+    var cuore = ctx.createRadialGradient(0, 0, 0, 0, 0, S * .35);
+    cuore.addColorStop(0, "rgba(255, 250, 225, .95)");
+    cuore.addColorStop(1, "rgba(255, 220, 120, 0)");
+    ctx.fillStyle = cuore;
+    ctx.beginPath(); ctx.arc(0, 0, S * .35, 0, 2 * PI); ctx.fill();
+
+    // gli stami, e il ricciolo d'oro
+    ctx.lineCap = "round";
+    for (i = 0; i < 6; i++) {
+      var b = -PI / 2 + (i - 2.5) * .28, sl = S * (.5 + caso() * .15);
+      var ex = Math.cos(b) * sl, ey = Math.sin(b) * sl * .9;
+      ctx.strokeStyle = "#f7d774";
+      ctx.lineWidth = Math.max(.8, S * .022);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(ex * .3, ey * .7, ex, ey);
+      ctx.stroke();
+      ctx.fillStyle = "#e39b2e";
+      ctx.beginPath();
+      ctx.ellipse(ex, ey, S * .05, S * .025, b + PI / 2, 0, 2 * PI);
+      ctx.fill();
+    }
+    ctx.strokeStyle = "#ffe89a";
+    ctx.lineWidth = Math.max(1, S * .025);
+    ctx.beginPath();
+    for (i = 0; i <= 40; i++) {
+      var tr = i / 40, ar = -PI / 2 + tr * PI * 3.2, rr = S * .05 + (1 - tr) * S * .28;
+      var sx = S * .08 + Math.cos(ar) * rr * (1 - tr * .3), sy = -S * .72 + tr * S * .3 + Math.sin(ar) * rr * .8;
+      if (i) ctx.lineTo(sx, sy); else ctx.moveTo(S * .02, -S * .05);
+    }
+    ctx.stroke();
+
+    // le scintille sul fiore
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = "rgba(255, 245, 210, .9)";
+    for (i = 0; i < 14; i++) {
+      var sa = caso() * 2 * PI, sr = S * (.2 + caso() * .85);
+      ctx.beginPath();
+      ctx.arc(Math.cos(sa) * sr, Math.sin(sa) * sr * .7 - S * .1, Math.max(.7, S * (.008 + caso() * .014)), 0, 2 * PI);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /* ── La tela viva ──────────────────────────────────────────────────────
+     Sopra il quadro fermo: le stelle che brillano e le cose che si muovono.
+     Ogni stagione lascia cadere la sua — petali, lucciole, foglie, neve —
+     e dai fiori sale il polline d'oro. Col puntatore si fa vento. */
+  var vivo = tela.vivo.getContext("2d");
+
+  function bagliore(r, gg, b) {
+    var c = document.createElement("canvas");
+    c.width = c.height = 64;
+    var x = c.getContext("2d"), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, "rgba(" + r + "," + gg + "," + b + ",1)");
+    gr.addColorStop(.22, "rgba(" + r + "," + gg + "," + b + ",.5)");
+    gr.addColorStop(1, "rgba(" + r + "," + gg + "," + b + ",0)");
+    x.fillStyle = gr;
+    x.fillRect(0, 0, 64, 64);
+    return c;
+  }
+  var LUCE_ORO = bagliore(255, 226, 140), LUCE_VERDE = bagliore(214, 255, 130), LUCE_BIANCA = bagliore(235, 244, 255);
+  var TIPI = ["petalo", "lucciola", "foglia", "fiocco"];
+  var FOGLIE_CADUTE = ["#e8892a", "#f3b33d", "#c9521c", "#de6f1d"];
+  var PETALI = ["#f6b3c8", "#fbd3df", "#ee93b2"];
+
+  var particelle = [];
+
+  function nasci(p, tipo, subito) {
+    var r = Math.random;
+    p.tipo = tipo;
+    p.eta = 0;
+    p.fase = r() * 2 * PI;
+    p.rot = r() * 2 * PI;
+    p.giro = (r() - .5) * 2.4;
+    if (tipo === "polline") {
+      var c = corolle[Math.floor(r() * corolle.length)] || { x: W / 2, y: H * .8, s: 40 };
+      p.x = c.x + (r() - .5) * c.s * .8;
+      p.y = c.y - c.s * .1;
+      p.bx = (r() - .5) * 10;
+      p.by = -12 - r() * 20;
+      p.vita = 4 + r() * 5;
+      p.dim = 1.2 + r() * 2.2;
+    } else {
+      var k = TIPI.indexOf(tipo), a = -PI + (k + r()) * PI / 2, b = bordo(a) * (.98 + r() * .3);
+      p.x = g.cx + Math.cos(a) * g.ax * b;
+      p.y = g.cy + Math.sin(a) * g.ay * b;
+      var ux = p.x - g.cx, uy = p.y - g.cy, ul = Math.sqrt(ux * ux + uy * uy) || 1;
+      var vel = tipo === "lucciola" ? 4 : 8 + r() * 14;
+      p.bx = ux / ul * vel;
+      p.by = uy / ul * vel + (tipo === "lucciola" ? 0 : 7);
+      p.vita = 7 + r() * 7;
+      p.dim = (tipo === "fiocco" ? 1.5 + r() * 2 : tipo === "lucciola" ? 1.4 + r() * 1.4 : 2.6 + r() * 2.4) * Math.max(.6, g.pen / 4);
+      p.colore = tipo === "foglia" ? FOGLIE_CADUTE[Math.floor(r() * 4)] : PETALI[Math.floor(r() * 3)];
+    }
+    p.vx = p.bx;
+    p.vy = p.by;
+    if (subito) {
+      p.eta = r() * p.vita;
+      p.x += p.bx * p.eta;
+      p.y += p.by * p.eta;
+    }
+  }
+
+  function popola() {
+    particelle = [];
+    var tanti = W < 700 ? 5 : 9, i, j;
+    for (i = 0; i < TIPI.length; i++) {
+      for (j = 0; j < tanti; j++) { var p = {}; nasci(p, TIPI[i], true); particelle.push(p); }
+    }
+    for (j = 0; j < tanti * 2; j++) { var q = {}; nasci(q, "polline", true); particelle.push(q); }
+  }
+
+  var gx = 0, gy = 0, mx = 0, my = 0, ptx = -1e4, pty = -1e4, prima = 0;
+  var sposta = { cielo: [0, 0], bosco: [0, 0], fiori: [0, 0] };
+
+  function parallasse() {
+    sposta.cielo[0] = -gx * 6;  sposta.cielo[1] = -gy * 4;
+    sposta.bosco[0] = -gx * 16; sposta.bosco[1] = -gy * 11;
+    sposta.fiori[0] = -gx * 28; sposta.fiori[1] = -gy * 14;
+    tela.cielo.style.transform = "translate3d(" + sposta.cielo[0].toFixed(2) + "px," + sposta.cielo[1].toFixed(2) + "px,0)";
+    tela.bosco.style.transform = "translate3d(" + sposta.bosco[0].toFixed(2) + "px," + sposta.bosco[1].toFixed(2) + "px,0) rotate(" + (gx * .7).toFixed(3) + "deg)";
+    tela.fiori.style.transform = "translate3d(" + sposta.fiori[0].toFixed(2) + "px," + sposta.fiori[1].toFixed(2) + "px,0)";
+    if (fila) fila.style.setProperty("--luce", (.5 - gx * .45).toFixed(3));
+  }
+
+  function disegnaVivo(ora, dt) {
+    var ctx = vivo, i, p, s, a;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "lighter";
+
+    // le stelle che brillano, al passo del cielo
+    var ox = sposta.cielo[0], oy = sposta.cielo[1];
+    a = .22 + .08 * Math.sin(ora * .0006);
+    s = g.lr * 7;
+    ctx.globalAlpha = a;
+    ctx.drawImage(LUCE_ORO, g.lx + ox - s / 2, g.ly + oy - s / 2, s, s);
+    for (i = 0; i < stelle.length; i++) {
+      var st = stelle[i];
+      a = .5 + .5 * Math.sin(ora * .001 * st.ritmo + st.fase);
+      s = st.grande ? st.r * (7 + 2.5 * a) : st.r * (4 + 4 * a);
+      ctx.globalAlpha = st.grande ? .35 + .3 * a : .15 + .6 * a * a;
+      ctx.drawImage(LUCE_ORO, st.x + ox - s / 2, st.y + oy - s / 2, s, s);
+    }
+
+    for (i = 0; i < particelle.length; i++) {
+      p = particelle[i];
+      if (dt) {
+        p.eta += dt;
+        if (p.eta > p.vita) { nasci(p, p.tipo); continue; }
+        if (p.tipo === "lucciola") {
+          p.bx += (Math.random() - .5) * 40 * dt;
+          p.by += (Math.random() - .5) * 40 * dt;
+          p.bx *= .99; p.by *= .99;
+        } else {
+          p.vx += Math.sin(ora * .0012 + p.fase) * 10 * dt;
+        }
+        // il vento del puntatore
+        var o = p.tipo === "polline" ? sposta.fiori : sposta.bosco;
+        var dx = p.x + o[0] - ptx, dy = p.y + o[1] - pty, d2 = dx * dx + dy * dy;
+        if (d2 < 22500) {
+          var d = Math.sqrt(d2) + 1, f = (1 - d / 150) * 140 * dt;
+          p.vx += dx / d * f;
+          p.vy += dy / d * f;
+        }
+        p.vx += (p.bx - p.vx) * Math.min(1, dt * .8);
+        p.vy += (p.by - p.vy) * Math.min(1, dt * .8);
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rot += p.giro * dt;
+      }
+
+      var sp = p.tipo === "polline" ? sposta.fiori : sposta.bosco;
+      var x = p.x + sp[0], y = p.y + sp[1];
+      var vis = Math.max(0, Math.min(1, p.eta / 1.2, (p.vita - p.eta) / 1.5));
+      var cresce = p.tipo === "polline" ? 1 : 1 + p.eta / p.vita * .9;   // cade verso di noi
+
+      if (p.tipo === "polline") {
+        s = p.dim * 5;
+        ctx.globalAlpha = vis * (.55 + .45 * Math.sin(ora * .004 + p.fase));
+        ctx.drawImage(LUCE_ORO, x - s / 2, y - s / 2, s, s);
+      } else if (p.tipo === "lucciola") {
+        s = p.dim * 8;
+        ctx.globalAlpha = vis * Math.max(0, Math.sin(ora * .0022 + p.fase));
+        ctx.drawImage(LUCE_VERDE, x - s / 2, y - s / 2, s, s);
+      } else if (p.tipo === "fiocco") {
+        s = p.dim * 3.2 * cresce;
+        ctx.globalAlpha = vis * .85;
+        ctx.drawImage(LUCE_BIANCA, x - s / 2, y - s / 2, s, s);
+      } else {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = vis * .9;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(p.rot);
+        ctx.scale(cresce, cresce * (.3 + .7 * Math.abs(Math.cos(ora * .0014 + p.fase))));
+        ctx.fillStyle = p.colore;
+        ctx.beginPath();
+        if (p.tipo === "petalo") {
+          ctx.ellipse(0, 0, p.dim * 1.5, p.dim, 0, 0, 2 * PI);
+        } else {
+          ctx.moveTo(-p.dim * 1.8, 0);
+          ctx.quadraticCurveTo(0, -p.dim * 1.2, p.dim * 1.8, 0);
+          ctx.quadraticCurveTo(0, p.dim * 1.2, -p.dim * 1.8, 0);
+        }
+        ctx.fill();
+        ctx.restore();
+        ctx.globalCompositeOperation = "lighter";
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  function battito(ora) {
+    requestAnimationFrame(battito);
+    if (!g) return;
+    var dt = prima ? Math.min(.05, (ora - prima) / 1000) : 0;
+    prima = ora;
+    // senza puntatore (dito, tavoletta) il quadro dondola piano da solo
+    if (!puntatore) {
+      mx = Math.sin(ora * .00012) * .8;
+      my = Math.sin(ora * .00009 + 1.3) * .5;
+    }
+    var f = 1 - Math.exp(-dt * 2.5);
+    gx += (mx - gx) * f;
+    gy += (my - gy) * f;
+    parallasse();
+    disegnaVivo(ora, dt);
+  }
+
+  /* ── Dipingere ─────────────────────────────────────────────────────────
+     Una tela per fotogramma, così la pagina non si blocca mentre dipinge.
+     Le tele appaiono insieme, quando sono pronte tutte. Il limite ai pixel
+     tiene a bada la memoria sugli schermi molto grandi. */
+  function prepara(canvas, margine) {
+    var w = W + 2 * margine, h = H + 2 * margine;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, margine * dpr, margine * dpr);
+    return ctx;
+  }
+
+  function dipingi() {
+    var w = quadro.clientWidth, h = quadro.clientHeight;
+    if (!w || !h || (w === W && h === H)) return;
+    W = w;
+    H = h;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(4.5e6 / ((W + 2 * M) * (H + 2 * M))));
+    g = geometria();
+
+    var mia = ++generazione, fasi = [
+      function () { dipingiCielo(prepara(tela.cielo, M), semina(11)); },
+      function () { dipingiFitto(prepara(tela.bosco, M), semina(23)); },
+      function () { dipingiAlberi(tela.bosco.getContext("2d"), semina(29)); },
+      function () { dipingiFiori(prepara(tela.fiori, M), semina(37)); },
+      function () {
+        prepara(tela.vivo, 0);
+        popola();
+        quadro.classList.add("dipinto");
+        if (fermo) disegnaVivo(0, 0);
+      }
+    ], i = 0;
+    (function prossima() {
+      if (mia !== generazione) return;
+      fasi[i++]();
+      if (i < fasi.length) requestAnimationFrame(function () { setTimeout(prossima, 0); });
+    })();
+  }
+
+  dipingi();
+  var attesa = 0;
+  addEventListener("resize", function () {
+    clearTimeout(attesa);
+    attesa = setTimeout(dipingi, 250);
   });
+
+  // Chi ha chiesto meno movimento trova il quadro fermo: dipinto, ma immobile.
+  if (fermo) return;
+
+  if (puntatore) {
+    addEventListener("pointermove", function (e) {
+      ptx = e.clientX;
+      pty = e.clientY;
+      mx = (ptx / innerWidth) * 2 - 1;
+      my = (pty / innerHeight) * 2 - 1;
+    }, { passive: true });
+    document.documentElement.addEventListener("pointerleave", function () {
+      ptx = pty = -1e4;
+      mx = my = 0;
+    });
+  }
+  requestAnimationFrame(battito);
 })();
 </script>
 </body>

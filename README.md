@@ -8,28 +8,40 @@ pubblicarla.
 
 ## Com'è fatta
 
-Il fondo è un muro di pannelli quadrati a profondità diverse. Quando il
-puntatore ci passa sopra, i pannelli lì attorno si girano, vengono avanti e si
-accendono del verde del marchio, poi tornano al loro posto con calma. Davanti
-al muro stanno i progetti, come lastre di vetro.
+La copertina è un quadro: una notte stellata vista da terra, a pancia in su,
+alla maniera di Van Gogh. In mezzo c'è una radura di cielo che gira in vortici,
+con la luna, le stelle grandi coi loro aloni e un nastro d'oro che serpeggia.
+Tutto attorno, gli alberi salgono dai bordi dello schermo verso il centro, e
+ogni angolo è una stagione, come le ore su un orologio: primavera in alto a
+sinistra, estate in alto a destra, autunno in basso a destra, inverno in basso
+a sinistra. In basso, davanti a tutto, tre gigli d'oro che fanno luce da sé.
+Davanti al quadro stanno i progetti, come lastre di vetro.
 
-I colori vengono tutti dal logo: il blu del cerchio, il verde della palma, il
-bianco, il nero. Il tema chiaro è la stessa cosa vista di giorno.
+Il quadro non è un'immagine: lo dipinge il JavaScript, a pennellate, su quattro
+tele una sopra l'altra — il cielo, il bosco, i fiori, e una tela "viva". Le
+pennellate seguono un campo di vortici; il caso è seminato, quindi il quadro è
+sempre lo stesso e cambia solo per adattarsi alla misura dello schermo. Si
+dipinge una tela per fotogramma, così la pagina non si blocca, e le tele
+compaiono insieme quando sono pronte. Quando la finestra cambia misura si
+ridipinge; la barra dell'indirizzo del telefono che va e viene no (il quadro è
+alto `100lvh`).
 
-Il muro lo costruisce il JavaScript: una griglia di pannelli, ognuno con la sua
-profondità e il suo tono decisi da un rumore fisso sulle coordinate, così la
-parete non cambia faccia a ogni ridimensionamento. Sugli schermi grandi i
-pannelli si allargano invece di moltiplicarsi, per non riempire la pagina di
-elementi.
+Sulla tela viva le stelle brillano e ogni stagione lascia cadere la sua cosa
+verso chi guarda: petali, lucciole, foglie, neve. Dai fiori sale il polline.
+Il puntatore fa vento, e le tele scivolano un poco a profondità diverse
+(parallasse): per questo sbordano di 48 px per lato, numero che sta sia nello
+stile sia nel JS. Dove il puntatore non c'è (telefono, tavoletta) il quadro
+dondola piano da solo. Chi ha chiesto meno movimento al sistema
+(`prefers-reduced-motion`) trova il quadro dipinto ma fermo. Senza JavaScript
+resta una notte blu sfumata e la pagina è comunque leggibile.
 
-Le lastre stanno su un arco rivolto verso chi guarda: quelle ai lati girano
-verso il centro e stanno un filo più indietro. Anche questo si rifà da sé
-quando la finestra cambia misura.
+Le prime immagini di riferimento erano due, prese da Pinterest: un bosco visto
+dal basso con l'autunno da una parte e l'estate dall'altra, e il fiore d'oro su
+un cielo a vortici. Non sono nel sito: il quadro è ridipinto da capo, nel loro
+spirito.
 
-Dove il puntatore non c'è (telefono, tavoletta) il muro dondola piano da solo.
-Chi ha chiesto meno movimento al sistema (`prefers-reduced-motion`) trova tutto
-fermo. Senza JavaScript il muro non c'è e la pagina resta una copertina
-normale, leggibile.
+I colori della pagina vengono dal quadro: il blu della notte, l'oro delle stelle
+e dei fiori. La copertina è una notte, quindi il tema chiaro non c'è.
 
 ## Aggiungere un progetto
 
@@ -68,9 +80,8 @@ Una lastra può vestirsi coi colori della sua app: si aggiunge una classe alla
 `<li class="scheda">` (per esempio `tema-lovemap`) e nello stile si
 ridefiniscono, solo per quella classe, le variabili del vetro (`--vetro`,
 `--vetro-alto`, `--bordo`, `--bordo-vivo`, `--accento`, `--pozza`, `--testo`,
-`--testo-tenue`), una volta per il tema scuro e una per il chiaro. Bordo, alone,
-pastiglia e hover le seguono da soli. Nel tema chiaro l'accento va scurito
-quanto basta perché il testo piccolo della pastiglia resti leggibile.
+`--testo-tenue`). Bordo, alone, pastiglia e hover le seguono da soli. Il vetro
+deve restare abbastanza pieno da tenere leggibile il testo sopra il quadro.
 
 LoveMap usa il blu notte e il rosa del cuore della sua schermata iniziale, e il
 lilla delle date. È privata: dietro il link c'è una schermata di accesso.
