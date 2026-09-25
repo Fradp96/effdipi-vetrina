@@ -46,8 +46,8 @@ e dei fiori. La copertina è una notte, quindi il tema chiaro non c'è.
 ## Aggiungere un progetto
 
 Copia il blocco `<li class="scheda">` dentro `index.html` e cambia icona,
-indirizzo (`href`), titolo e descrizione. La griglia si riorganizza da sola e
-le lastre si rimettono in fila.
+indirizzo (`href`), titolo e descrizione. Le lastre si rimettono in fila da
+sole, e una rimasta sola sull'ultima riga sta nel mezzo.
 
 Gli indirizzi da cambiare sono **due**, e vogliono lo stesso valore: quello sul
 titolo e quello sul link `class="copre"`, il gemello invisibile che rende
@@ -85,6 +85,8 @@ deve restare abbastanza pieno da tenere leggibile il testo sopra il quadro.
 
 LoveMap usa il blu notte e il rosa del cuore della sua schermata iniziale, e il
 lilla delle date. È privata: dietro il link c'è una schermata di accesso.
+Health usa il verde della sua foglia e il crema delle sue pagine; anche lei è
+privata.
 
 Ogni progetto vive dove gli pare: un sottodominio può puntare a un server
 diverso da un altro. Questa pagina è solo l'elenco.

@@ -141,10 +141,12 @@
     max-width: 34rem;
   }
 
+  /* In fila e a capo, centrate: una lastra rimasta sola sull'ultima riga
+     sta nel mezzo, non a sinistra come in una griglia. */
   .progetti {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: 3.25rem 1.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
     justify-content: center;
     list-style: none;
     margin: 0;
@@ -153,6 +155,8 @@
 
   .scheda {
     position: relative;
+    flex: 0 1 20rem;
+    min-width: min(15rem, 100%);
   }
 
   /* L'alone d'oro che la lastra lascia sotto di sé. */
@@ -338,6 +342,20 @@
     color: var(--testo);
   }
 
+  /* Health: il verde della sua foglia e il crema delle sue pagine. */
+  .scheda.tema-health {
+    --vetro: #10241aee;
+    --vetro-alto: #1b3a29f2;
+    --bordo: #2f5a41;
+    --bordo-vivo: #5cc48a;
+    --accento: #5cc48a;
+    --pozza: #5cc48a40;
+    --riflesso: #f6f1e433;
+    --testo: #f6f1e4;
+    --testo-tenue: #b9c9bd;
+    color: var(--testo);
+  }
+
   footer {
     margin-top: 4rem;
     text-align: center;
@@ -426,6 +444,29 @@
         </span>
         <h2><a href="https://lovemap.effdipi.it" target="_blank" rel="noopener">LoveMap</a></h2>
         <p>La mappa dei nostri viaggi e dei nostri ricordi.</p>
+        <span class="stato">
+          Privata
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M9 7h8v8"></path>
+          </svg>
+        </span>
+      </div>
+    </li>
+
+    <li class="scheda tema-health">
+      <div class="lastra">
+        <a class="copre" href="https://health.effdipi.it" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"></a>
+        <span class="icona" aria-hidden="true">
+          <!-- la foglia di Health: stesso disegno di public/icona.svg nel suo repo -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 19.5C4.5 10.5 10.5 5.1 19.5 4.5c0 9.6-5.4 15-15 15z"></path>
+            <path d="M5.4 18.6 14.7 9.3"></path>
+            <path d="M9.9 14.1h3.3M11.55 15.75v-3.3"></path>
+          </svg>
+        </span>
+        <h2><a href="https://health.effdipi.it" target="_blank" rel="noopener">Health</a></h2>
+        <p>Dieta, piano dei pasti, ricette, spesa e dispensa di casa.</p>
         <span class="stato">
           Privata
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
